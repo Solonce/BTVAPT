@@ -144,7 +144,8 @@ def register(cls: type[Adapter]) -> type[Adapter]:
 
 
 def get_adapter_class(platform: str) -> type[Adapter]:
-    import btv.sources.buildium  # noqa: F401  (registers built-ins)
+    import btv.sources.appfolio  # noqa: F401  (registers built-ins)
+    import btv.sources.buildium  # noqa: F401
     import btv.sources.file  # noqa: F401
     import btv.sources.nesthub  # noqa: F401
 

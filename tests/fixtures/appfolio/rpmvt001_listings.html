@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<!--[if IE 8 ]><html class="ie ie8"><![endif]-->
+<!--[if IE 9 ]><html class="ie ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--><html lang="en"><!--<![endif]-->
+<head>
+      
+<script
+  src="https://www.datadoghq-browser-agent.com/us1/v6/datadog-rum.js"
+  type="text/javascript">
+</script>
+
+
+<script>
+  window.DD_RUM && window.DD_RUM.init({
+    clientToken: 'pub9f3f4ad4c7295c18cbcaf3c8dc5e1ac5',
+    applicationId: 'f9265575-7008-4dd5-8a3e-00761ebfb44a',
+    site: 'datadoghq.com',
+    service: 'listings',
+    env: 'production',
+    version: 'cd_live-b30f5a4096095b4d012a946f91386167293d2421',
+    sessionSampleRate: 25,
+    sessionReplaySampleRate: 2.0,
+    trackUserInteractions: true,
+    trackResources: true,
+    trackLongTasks: true,
+    traceSampleRate: 100,
+    traceContextInjection: 'all',
+    defaultPrivacyLevel: 'mask',
+    allowedTracingUrls: [/https:\/\/.*\.appfolio\.com/, /https:\/\/(?!snowplow-collector\.).*\.appf\.io/, /https:\/\/.*\.appfolioinc\.com/, /https:\/\/.*\.foliospace\.com/],
+  });
+  window.DD_RUM && window.DD_RUM.setGlobalContextProperty('team', 'vacancy-marketing');
+  window.DD_RUM && window.DD_RUM.setGlobalContextProperty('slice', 'p2502d');
+</script>
+
+
+    <script>
+  let AfObservability = (function () {
+    if (!window.DD_RUM) {
+      console.error("AfObservability: window.DD_RUM is not available.");
+      return {};
+    }
+
+    function createFacadeFunction(ddFuncName) {
+      return function () {
+        window.DD_RUM[ddFuncName].apply(window.DD_RUM, arguments);
+      };
+    }
+
+    let facade = {};
+
+    for (let ddFuncName in window.DD_RUM) {
+      if (typeof window.DD_RUM[ddFuncName] === 'function') {
+        facade[ddFuncName] = createFacadeFunction(ddFuncName);
+      }
+    }
+
+    return facade;
+  })();
+</script>
+
+
+  <script>
+  const attributes = {"uuid":"16d902e9-f457-4a03-9eeb-46c9038d6431"}
+  window.__USER_ATTRIBUTES__ = attributes;
+  window.optimizely = window.optimizely || [];
+  window.optimizely.push({
+    type: 'user',
+    attributes
+  });
+</script>
+
+  <script async type="text/javascript" src='https://h.online-metrix.net/fp/tags.js?org_id=5kfca2gp&amp;session_id=8a219786-b411-4543-af45-46293d0cae78'></script>
+
+  <script src="https://public.cdn.appfolio.com/public/assets/scripts/ios12-array-reverse-fix-polyfill.js"></script>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-N443R47');</script>
+
+
+  <meta charset="utf-8">
+  <title>Rental Listings</title>
+
+  <meta name="description" content="">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scaleProfileSnapshotClientTest=1.0, user-scalable=no, minimal-ui">
+  <meta http-equiv="cleartype" content="on">
+
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="">
+
+  <meta name="msapplication-config" content="none" />
+
+  <link rel="icon" type="image/x-icon" href="https://public.cdn.appfolio.com/public/favicons/favicon.ico" sizes="16x16 24x24 32x32 48x48 64x64" /><link rel="apple-touch-icon-precomposed" type="image/x-icon" href="https://listings.cdn.appfolio.com/listings/assets/listings/appfolio_touch-90fc6855d75f24e7ec2e1b36f2ff871a6ff2e70d4b5faf28c861363994b44ae8.png" /><link rel="apple-touch-startup-image" type="image/x-icon" href="https://listings.cdn.appfolio.com/listings/assets/listings/appfolio_startup-d9243797170560b61e4ad09679cfb1c2fab7410ebc95c245b9e1dff89a3fac82.png" />
+
+  <link rel="stylesheet" href="https://listings.cdn.appfolio.com/listings/assets/listings/application2-09f63b334c5546fef4434a8f82f83bca70ea2b084017614422be88418b52adfc.css" media="all" />
+
+  <link rel="stylesheet" href="https://public.cdn.appfolio.com/bootstrap-coastline/6.5.2/bootstrap-coastline.min.css" />
+  <link rel="stylesheet" href="https://public.cdn.appfolio.com/public/icons/font-awesome/6.2.0/css/all.min.css" />
+
+      <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700' rel='stylesheet' type='text/css'>
+
+  <style type="text/css">
+
+    .theme-color {
+      background-color: #676767 !important;
+    }
+
+    .theme-color-text {
+      color: #676767 !important;
+    }
+
+    .corner-tag:before {
+      border-bottom-color: #676767 !important;
+    }
+
+    .theme-color-border {
+      border-color: #676767 !important;
+    }
+
+    .theme-color--actionable:hover, .theme-color--actionable:focus, .theme-color--actionable:active {
+      background-color: #525252 !important;
+    }
+
+  </style>
+  <link rel="stylesheet" href="https://listings.cdn.appfolio.com/listings/assets/listings/listings/listings_index-f8582b53f6b4ba9d06ff924c4c4d2e92191176fa45763f6ac05d90b271d0470f.css" />
+
+
+  <!--[if lt IE 9]>
+    <script src="https://listings.cdn.appfolio.com/listings/assets/listings/ie-shims-853f0010aec4ce921280d2353e71b099d0fc0d074b3c87c7838b7203290d5ffc.js"></script>
+  <![endif]-->
+
+</head>
+<body>
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id="GTM-N443R47"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+
+  <noscript>
+  <iframe style="width: 100px; height: 100px; border: 0; position: absolute; top: -5000px;" src='https://h.online-metrix.net/fp/tags?org_id=5kfca2gp&amp;session_id=8a219786-b411-4543-af45-46293d0cae78'></iframe>
+</noscript>
+
+    <script>
+    (
+      function (p, l, o, w, i, n, g) {
+        if (!p[i]) {
+          p.GlobalSnowplowNamespace = p.GlobalSnowplowNamespace || [];
+          p.GlobalSnowplowNamespace.push(i);
+          p[i] = function () {
+            (p[i].q = p[i].q || []).push(arguments)
+          };
+          p[i].q = p[i].q || [];
+          n = l.createElement(o);
+          g = l.getElementsByTagName(o)[0];
+          n.async = 1;
+          n.crossOrigin = 'anonymous';
+          n.src = w;
+          g.parentNode.insertBefore(n, g)
+        }
+      }(window,document,"script","https://public.cdn.appfolio.com/public/assets/scripts/snowfolio/4.3.1/snowfolio.js","snowplow")
+    );
+    const collector_url = 'https://snowplow-collector.dataplatform.appfolio.net';
+    const pageAccessedByReload = (
+      (window.performance.navigation && window.performance.navigation.type === 1) ||
+        window.performance
+          .getEntriesByType('navigation')
+          .map((nav) => nav.type)
+          .includes('reload')
+    );
+    window.snowplow('newTracker', 'listingsTracker', collector_url, {
+      appId: 'listings',
+      postPath: '/io.augur.snowplow/1-0-0'
+    });
+    //TODO: How to identify a user and their attributes? Is there some sort of UUID and email address we can use from Listings App?
+    // window.snowplow('setUserId', user.uuid);
+    window.snowplow('addGlobalContexts', [{
+      schema: 'iglu:io.augur.snowplow/identity_lite/jsonschema/1-0-0',
+      data: {
+        email: null,
+        role: null,
+        vhost_id: 'listings',
+        vhost_name: 'listings',
+        isPmSession: false,
+        is_page_reload: pageAccessedByReload
+      }
+    }]);
+    window.snowplow('enableActivityTracking', {
+      minimumVisitLength: 60,
+      heartbeatDelay: 60
+    });
+    window.snowplow('trackPageView');
+    let windowUrl = window.location.pathname;
+    /*
+     * Adds a click event listener to an iframe identified by its name.
+     *
+     * @param {string} name - The name attribute of the iframe to which the event listener is to be added.
+     * @param {function} listener - The event listener function to be added to the iframe.
+     */
+    function addEventListenerToIframe(name, listener) {
+      // Get all iframes with the given name. It returns a NodeList.
+      const iframes = document.getElementsByName(name);
+
+      // Check if there's at least one iframe with the given name.
+      if (iframes.length > 0) {
+        // Check if the contentWindow and document properties exist on the first iframe.
+        if (iframes[0].contentWindow && iframes[0].contentWindow.document) {
+          // Add a click event listener to the document within the iframe's contentWindow.
+          iframes[0].contentWindow.document.addEventListener('click', listener, true);
+        }
+      }
+    }
+    function on_click_plow_page () {
+      const newUrl = window.location.pathname;
+      if (windowUrl !== newUrl) {
+          window.snowplow('trackPageView');
+          windowUrl = newUrl;
+        }
+      // Add a click event listener to the iframe with name 'intercom-launcher-frame' using the on_click_plow function.
+      addEventListenerToIframe('intercom-launcher-frame', on_click_plow);
+      
+      // Add a click event listener to the iframe with name 'intercom-messenger-frame' using the on_click_plow function.
+      addEventListenerToIframe('intercom-messenger-frame', on_click_plow);
+    }
+    const targetNode = document;
+    const observerOptions = {
+      childList: true,
+      attributes: true,
+      subtree: true
+    };
+    const observer = new MutationObserver(on_click_plow_page);
+    observer.observe(targetNode, observerOptions);
+
+    function getParents(e){
+      /*
+        Traverse upwards and adds each parent node to the nodes array as it goes
+        Once it runs into an undefined parent node or the current node is the document, exit the loop
+        At each element upwards, grab the label(s)' text contents, the id value and the classes (that don't start with 'supports')
+        Return the three separate arrays of Ids, Labels, Classes packed into a single array
+      */
+      var element = e.target;
+      const allParentElementIds = []; // Array to hold all parent node element IDs
+      const allParentElementLabels = []; // Array to hold all parent node labels
+      const allParentClasses = []; // Array to hold all parent node element classes
+      let isSearch = false;
+      let searchDataPosition = null;
+      while(element && element !== document) {
+        if (element.id) {
+          if (element.id === 'apm-global-search') {
+            isSearch = true;
+          }
+          allParentElementIds.push(element.id);
+        }
+        if (element.getAttribute('data-position') !== null) {
+          searchDataPosition = element.getAttribute('data-position');
+        }
+        if (element.labels) {
+          element.labels.forEach((label) => {
+            if (label.textContent) {
+              allParentElementLabels.push(label.textContent);
+            }
+          });
+        }
+        element.classList.forEach((classes) => {
+          if (classes && !classes.startsWith('supports')) {
+              allParentClasses.push(classes);
+            }
+        });
+        element = element.parentNode;
+      }
+      return [allParentElementIds, allParentClasses, allParentElementLabels, isSearch, searchDataPosition];
+    }
+    function isDataPairClick(e) {
+      var classes = [...e.target.classList];
+      return classes.includes('datapair__value'); // just returning whether it was a datapair__value element that was clicked, True if yes, False if no.
+    }
+    function on_click_plow(e) {
+      if ( isDataPairClick(e) ) { // check if the click happened on a datapair__value element (often contain PII/Sensitive data) and skip it if so.
+        return false
+      }
+      const parentResults = getParents(e); // retrieve parent element Ids, classes and labels arrays
+      const allElementIds = parentResults[0]; // retrieve allParentElementIds array into allElementIds
+      const allParentClasses = parentResults[1]; // retrieve allParentClasses array into allElementIds
+      const allParentLabels = parentResults[2] // retrieve allParentElementLabels array into allElementIds
+      const search = parentResults[3];
+      const pageUrlComponents = window.location.pathname.split("/").filter(a => a); // parse the pathname into each individual element separated by "/"
+      let searchTerm = null;
+      let searchResponseUuid;
+      const searchPosition = parentResults[4];
+      /*
+        targetUrl is a REQUIRED field in the final payload
+        First, attempt to set the targetURL variable to be the href attribute of the clicked element
+        If that results in an empty string or an undefined value for targetURL variable, set the targetURL variable to be the current page URL
+      */
+      var targetURL = e.target.getAttribute('href');
+      var parentTargetURL = 'N/A';
+      if (typeof e.target.parentNode?.getAttribute == 'function') {
+        parentTargetURL = e.target.parentNode.getAttribute('href');
+      }
+      if (!targetURL) {
+        if(parentTargetURL) {
+          targetURL = parentTargetURL;
+        } else {
+          targetURL = 'N/A';
+        }
+      }
+      if (search==true) {
+        searchTerm = document.getElementById('global-search-input').getAttribute('value');
+        searchResponseUuid = document.getElementById('global-search-container').getAttribute('data-search-response-uuid');
+      }
+      /*
+        parse attribute name/values into key/value pair json blob for ease of querying final event structure
+      */
+      const getAllAttributes = {};
+      let attributesList;
+      if (e.target.attributes instanceof Array) {
+        attributesList = e.target.attributes; // if the attributes are an array, we can just use them as is
+      } else {
+        attributesList = [...e.target.attributes]; // otherwise, they need to be put into an array so we can use them to build out the attribute json blob
+      }
+      attributesList.forEach((element) => {
+        // Do not record `src` attribute
+        if (element.name === 'src') {
+          return;
+        }
+
+        // Check if the attribute is 'value' or contains 'cache'
+        const isPossiblySensitive = element.name == 'value' || element.name.toLowerCase().includes('cache');
+
+        // Check if 'snowplow-allow-value' is present in the element attribute values or in the list of parent classes
+        const isWhitelisted = Object.values(attributesList).includes('snowplow-allow-value') || allParentClasses.includes('snowplow-allow-value');
+
+        // If the attribute is not sensitive, or is whitelisted, record the attribute
+        if (!isPossiblySensitive || isWhitelisted) {
+          getAllAttributes[element.name] = element.value;
+        }
+      });
+      /*
+        send trackLinkClick event to the snowplow event collector
+      */
+      window.snowplow('trackLinkClick', {
+        targetUrl: targetURL,
+        elementId: e.target.id,
+        elementClasses: [...e.target.classList],
+        elementContent: e.target.innerText,
+        context: [{
+          schema: 'iglu:io.augur.snowplow/identity_lite/jsonschema/1-0-0',
+          data: {
+            elementType: e.target.tagName,
+            elementAttributes: getAllAttributes,
+            pageURLComponents: pageUrlComponents,
+            elementParentClasses: allParentClasses,
+            elementParentElementIds: allElementIds,
+            elementParentLabels: allParentLabels,
+            isGlobalSearch: search,
+            globalSearchTerm: searchTerm,
+            searchPositionIndex: searchPosition,
+            searchResponseUuid: searchResponseUuid
+          }
+        }]
+      });
+    }
+    document.addEventListener("click", on_click_plow, true);
+    // Add a click event listener to the iframe with name 'intercom-launcher-frame' using the on_click_plow function.
+    addEventListenerToIframe('intercom-launcher-frame', on_click_plow);    
+    // Add a click event listener to the iframe with name 'intercom-messenger-frame' using the on_click_plow function.
+    addEventListenerToIframe('intercom-messenger-frame', on_click_plow);
+  </script>
+
+
+  <main>
+    
+
+
+<form id="filters" class="form js-filter-form form--stacked form--full-width hand-hidden" autocomplete="off" novalidate="novalidate" action="/listings/listings" accept-charset="UTF-8" data-remote="true" method="get">
+
+  <div class="topbar theme-color js-top-bar">
+  <div class="u-float-left">
+    <label class="topbar__sort-by__label mb-0" for="filters_order_by">Sort By</label>
+    <select include_blank="false" class="topbar__sort-by" name="filters[order_by]" id="filters_order_by"><option selected="selected" value="date_posted">Most Recent</option>
+<option value="rent_asc">Rent (Low to High)</option>
+<option value="rent_desc">Rent (High to Low)</option>
+<option value="bedrooms">Bedrooms</option></select>
+  </div>
+
+  <div class="u-float-right">
+    <ul class="topbar__options mb-0">
+      <li class="topbar__item theme-color theme-color--actionable hand-hidden">
+        <a href="#" class="text-white js-toggle-map-button"><span class="fa-solid fa-location-dot"></span> Show Map</a>
+      </li>
+      <li class="topbar__item theme-color theme-color--actionable">
+        <a href="#" class="text-white js-filter-button"><span class="fa-solid fa-filter"></span> Filter</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+  <input autocomplete="off" type="hidden" name="filters[property_list]" id="filters_property_list" />
+
+  <div class="filter-menu">
+    <div class="grid">
+      <div class="grid__6">
+        <div class="form__row">
+          <label class="form__row__label">Price Range</label>
+
+          <div class="form__row__body">
+            <div class="form__row__field-wrapper">
+              <ul class="grid grid--no-gutters p-0 mb-0">
+                <li class="grid__5"><select include_blank="false" name="filters[market_rent_from]" id="filters_market_rent_from"><option value="">No Min.</option>
+<option value="1500">$1,500</option>
+<option value="1600">$1,600</option>
+<option value="1700">$1,700</option>
+<option value="1800">$1,800</option>
+<option value="1900">$1,900</option>
+<option value="2000">$2,000</option>
+<option value="2250">$2,250</option>
+<option value="2500">$2,500</option>
+<option value="2750">$2,750</option>
+<option value="3000">$3,000</option>
+<option value="3500">$3,500</option>
+<option value="4000">$4,000</option>
+<option value="4500">$4,500</option></select></li>
+                <li class="grid__2 u-text-center" style="line-height: 2em;">to</li>
+                <li class="grid__5"><select include_blank="false" name="filters[market_rent_to]" id="filters_market_rent_to"><option value="">No Max.</option>
+<option value="1500">$1,500</option>
+<option value="1600">$1,600</option>
+<option value="1700">$1,700</option>
+<option value="1800">$1,800</option>
+<option value="1900">$1,900</option>
+<option value="2000">$2,000</option>
+<option value="2250">$2,250</option>
+<option value="2500">$2,500</option>
+<option value="2750">$2,750</option>
+<option value="3000">$3,000</option>
+<option value="3500">$3,500</option>
+<option value="4000">$4,000</option>
+<option value="4500">$4,500</option></select></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div class="grid__6">
+          <div class="grid">
+            <div class="form__row grid__6"><label class="form__row__label" for="filters_bedrooms">Bedrooms</label><div class="form__row__body"><div class="form__row__field-wrapper"><select name="filters[bedrooms]" id="filters_bedrooms"><option value="">0+</option>
+<option value="1">1+</option>
+<option value="2">2+</option>
+<option value="3">3+</option>
+<option value="4">4+</option>
+<option value="5">5+</option></select></div></div></div>
+            <div class="form__row grid__6"><label class="form__row__label" for="filters_bathrooms">Bathrooms</label><div class="form__row__body"><div class="form__row__field-wrapper"><select name="filters[bathrooms]" id="filters_bathrooms"><option value="">0+</option>
+<option value="1">1+</option>
+<option value="2">2+</option></select></div></div></div>
+          </div>
+        </div>
+
+    </div>
+
+    <div class="grid">
+      <div class="grid__6">
+        <div class="form__row"><label class="form__row__label" for="filters_cities">Cities</label><div class="form__row__body"><div class="form__row__field-wrapper"><input name="filters[cities][]" type="hidden" value="" autocomplete="off" /><select multiple="multiple" size="5" class="filter-menu__multi-select" name="filters[cities][]" id="filters_cities"><option value="All Cities">All Cities</option>
+<option value="Burlington">Burlington</option>
+<option value="Colchester">Colchester</option>
+<option value="Essex Junction">Essex Junction</option>
+<option value="Milton">Milton</option>
+<option value="Richmond">Richmond</option>
+<option value="Shelburne">Shelburne</option>
+<option value="South Burlington">South Burlington</option>
+<option value="St. George">St. George</option></select></div></div></div>
+      </div>
+      <div class="grid__6">
+        <div class="form__row"><label class="form__row__label" for="filters_postal_codes">Zip Codes</label><div class="form__row__body"><div class="form__row__field-wrapper"><input name="filters[postal_codes][]" type="hidden" value="" autocomplete="off" /><select multiple="multiple" size="5" class="filter-menu__multi-select" name="filters[postal_codes][]" id="filters_postal_codes"><option value="All Zip Codes">All Zip Codes</option>
+<option value="05401">05401</option>
+<option value="05403">05403</option>
+<option value="05446">05446</option>
+<option value="05452">05452</option>
+<option value="05468">05468</option>
+<option value="05477">05477</option>
+<option value="05482">05482</option>
+<option value="05495">05495</option></select></div></div></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="grid__6">
+      <div class="form__row"><label class="form__row__label" for="filters_cats">Cats Allowed</label><div class="form__row__body"><div class="form__row__field-wrapper"><select name="filters[cats]" id="filters_cats"><option value="" label=" "></option>
+<option value="Cats allowed">Yes</option>
+<option value="Cats not allowed">No</option></select></div></div></div>
+      </div>
+      <div class="grid__6">
+      <div class="form__row"><label class="form__row__label" for="filters_dogs">Dogs Allowed</label><div class="form__row__body"><div class="form__row__field-wrapper"><select name="filters[dogs]" id="filters_dogs"><option value="" label=" "></option>
+<option value="Dogs allowed">Large</option>
+<option value="Small dogs allowed">Small</option>
+<option value="Dogs not allowed">None</option></select></div></div></div>
+      </div>
+      <div class="grid__5">
+        <div class="form__row">
+          <div class="form__row__body">
+            <div class="form__row__field-wrapper">
+              <ul class="grid grid--no-gutters p-0">
+                <div class="form__row"><label class="form__row__label" for="filters_desired_move_in">Desired Move In</label><div class="form__row__body"><div class="form__row__field-wrapper"><div class="js-gears-date input-add-on"><input class="js-datepicker" type="text" name="filters[desired_move_in]" id="filters_desired_move_in" /><span class="js-datepicker-trigger input-add-on__append button"><span class="icon icon-calendar"></span></span></div></div></div></div>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="u-text-center">
+      <input type="submit" name="commit" value="Filter" class="filter-form-button btn btn-primary theme-color theme-color--actionable theme-color-border" data-disable-with="Filter" />
+    </div>
+  </div>
+</form>
+<form id="mobile_filters" class="form js-mobile-filter-form form--stacked form--full-width desk-hidden tablet-hidden" autocomplete="off" novalidate="novalidate" action="/listings/listings" accept-charset="UTF-8" data-remote="true" method="get">
+
+  <div class="topbar theme-color js-top-bar">
+  <div class="u-float-left">
+    <label class="topbar__sort-by__label mb-0" for="mobile_filters_order_by">Sort By</label>
+    <select include_blank="false" class="topbar__sort-by" name="filters[order_by]" id="mobile_filters_order_by"><option selected="selected" value="date_posted">Most Recent</option>
+<option value="rent_asc">Rent (Low to High)</option>
+<option value="rent_desc">Rent (High to Low)</option>
+<option value="bedrooms">Bedrooms</option></select>
+  </div>
+
+  <div class="u-float-right">
+    <ul class="topbar__options mb-0">
+      <li class="topbar__item theme-color theme-color--actionable hand-hidden">
+        <a href="#" class="text-white js-toggle-map-button"><span class="fa-solid fa-location-dot"></span> Show Map</a>
+      </li>
+      <li class="topbar__item theme-color theme-color--actionable">
+        <a href="#" class="text-white js-filter-button"><span class="fa-solid fa-filter"></span> Filter</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
+  <input autocomplete="off" type="hidden" name="filters[property_list]" id="mobile_filters_property_list" />
+
+  <div class="filter-menu">
+    <div class="grid">
+      <div class="grid__12">
+        <div class="form__row">
+          <div class="form__row__body">
+            <div class="form__row__field-wrapper">
+              <ul class="grid grid--no-gutters p-0">
+                <li class="grid__5 u-text-left" style="line-height: 2em; font-weight: bold">
+                  <label>Price Range</label>
+                </li>
+                <li class="grid__3"><select include_blank="false" name="filters[market_rent_from]" id="mobile_filters_market_rent_from"><option value="">No Min.</option>
+<option value="1500">$1,500</option>
+<option value="1600">$1,600</option>
+<option value="1700">$1,700</option>
+<option value="1800">$1,800</option>
+<option value="1900">$1,900</option>
+<option value="2000">$2,000</option>
+<option value="2250">$2,250</option>
+<option value="2500">$2,500</option>
+<option value="2750">$2,750</option>
+<option value="3000">$3,000</option>
+<option value="3500">$3,500</option>
+<option value="4000">$4,000</option>
+<option value="4500">$4,500</option></select></li>
+                <li class="grid__1">&nbsp;</li>
+                <li class="grid__3"><select include_blank="false" name="filters[market_rent_to]" id="mobile_filters_market_rent_to"><option value="">No Max.</option>
+<option value="1500">$1,500</option>
+<option value="1600">$1,600</option>
+<option value="1700">$1,700</option>
+<option value="1800">$1,800</option>
+<option value="1900">$1,900</option>
+<option value="2000">$2,000</option>
+<option value="2250">$2,250</option>
+<option value="2500">$2,500</option>
+<option value="2750">$2,750</option>
+<option value="3000">$3,000</option>
+<option value="3500">$3,500</option>
+<option value="4000">$4,000</option>
+<option value="4500">$4,500</option></select></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div class="grid__12">
+          <div class="form__row"><label class="form__row__label" for="mobile_filters_bedrooms">Bedrooms</label><div class="form__row__body"><div class="form__row__field-wrapper">
+            <div class="radio_block mobile_filters_bedrooms"><input type="hidden" name="filters[bedrooms]" value="" autocomplete="off" /><span><input type="radio" value="" checked="checked" name="filters[bedrooms]" id="mobile_filters_bedrooms_" /><label class="theme-color theme-color-border" for="mobile_filters_bedrooms_">0+</label></span><span><input type="radio" value="1" name="filters[bedrooms]" id="mobile_filters_bedrooms_1" /><label class="theme-color theme-color-border" for="mobile_filters_bedrooms_1">1+</label></span><span><input type="radio" value="2" name="filters[bedrooms]" id="mobile_filters_bedrooms_2" /><label class="theme-color theme-color-border" for="mobile_filters_bedrooms_2">2+</label></span><span><input type="radio" value="3" name="filters[bedrooms]" id="mobile_filters_bedrooms_3" /><label class="theme-color theme-color-border" for="mobile_filters_bedrooms_3">3+</label></span><span><input type="radio" value="4" name="filters[bedrooms]" id="mobile_filters_bedrooms_4" /><label class="theme-color theme-color-border" for="mobile_filters_bedrooms_4">4+</label></span><span><input type="radio" value="5" name="filters[bedrooms]" id="mobile_filters_bedrooms_5" /><label class="theme-color theme-color-border" for="mobile_filters_bedrooms_5">5+</label></span></div>
+</div></div></div>        </div>
+        <div class="grid__12">
+          <div class="form__row"><label class="form__row__label" for="mobile_filters_bathrooms">Bathrooms</label><div class="form__row__body"><div class="form__row__field-wrapper">
+            <div class="radio_block mobile_filters_bathrooms"><input type="hidden" name="filters[bathrooms]" value="" autocomplete="off" /><span><input type="radio" value="" checked="checked" name="filters[bathrooms]" id="mobile_filters_bathrooms_" /><label class="theme-color theme-color-border" for="mobile_filters_bathrooms_">0+</label></span><span><input type="radio" value="1" name="filters[bathrooms]" id="mobile_filters_bathrooms_1" /><label class="theme-color theme-color-border" for="mobile_filters_bathrooms_1">1+</label></span><span><input type="radio" value="2" name="filters[bathrooms]" id="mobile_filters_bathrooms_2" /><label class="theme-color theme-color-border" for="mobile_filters_bathrooms_2">2+</label></span><span><input type="radio" value="3" name="filters[bathrooms]" id="mobile_filters_bathrooms_3" /><label class="theme-color theme-color-border" for="mobile_filters_bathrooms_3">3+</label></span><span><input type="radio" value="4" name="filters[bathrooms]" id="mobile_filters_bathrooms_4" /><label class="theme-color theme-color-border" for="mobile_filters_bathrooms_4">4+</label></span><span><input type="radio" value="5" name="filters[bathrooms]" id="mobile_filters_bathrooms_5" /><label class="theme-color theme-color-border" for="mobile_filters_bathrooms_5">5+</label></span></div>
+</div></div></div>        </div>
+
+      <div class="grid__12">
+        <div class="form__row multiselect_box mobile_filters_cities"><label class="form__row__label">Cities</label><div class="form__row__body"><div class="form__row__field-wrapper"><input type="hidden" name="filters[cities][]" value="" autocomplete="off" /><span class="form__row__control"><label for="mobile_filters_cities_all_cities"><input type="checkbox" value="All Cities" name="filters[cities][]" id="mobile_filters_cities_all_cities" />All Cities</label></span><span class="form__row__control"><label for="mobile_filters_cities_burlington"><input type="checkbox" value="Burlington" name="filters[cities][]" id="mobile_filters_cities_burlington" />Burlington</label></span><span class="form__row__control"><label for="mobile_filters_cities_colchester"><input type="checkbox" value="Colchester" name="filters[cities][]" id="mobile_filters_cities_colchester" />Colchester</label></span><span class="form__row__control"><label for="mobile_filters_cities_essex_junction"><input type="checkbox" value="Essex Junction" name="filters[cities][]" id="mobile_filters_cities_essex_junction" />Essex Junction</label></span><span class="form__row__control"><label for="mobile_filters_cities_milton"><input type="checkbox" value="Milton" name="filters[cities][]" id="mobile_filters_cities_milton" />Milton</label></span><span class="form__row__control"><label for="mobile_filters_cities_richmond"><input type="checkbox" value="Richmond" name="filters[cities][]" id="mobile_filters_cities_richmond" />Richmond</label></span><span class="form__row__control"><label for="mobile_filters_cities_shelburne"><input type="checkbox" value="Shelburne" name="filters[cities][]" id="mobile_filters_cities_shelburne" />Shelburne</label></span><span class="form__row__control"><label for="mobile_filters_cities_south_burlington"><input type="checkbox" value="South Burlington" name="filters[cities][]" id="mobile_filters_cities_south_burlington" />South Burlington</label></span><span class="form__row__control"><label for="mobile_filters_cities_st__george"><input type="checkbox" value="St. George" name="filters[cities][]" id="mobile_filters_cities_st__george" />St. George</label></span></div></div></div>
+      </div>
+      <div class="grid__12">
+        <div class="form__row multiselect_box mobile_filters_postal_codes"><label class="form__row__label">Zip Codes</label><div class="form__row__body"><div class="form__row__field-wrapper"><input type="hidden" name="filters[postal_codes][]" value="" autocomplete="off" /><span class="form__row__control"><label for="mobile_filters_postal_codes_all_zip_codes"><input type="checkbox" value="All Zip Codes" name="filters[postal_codes][]" id="mobile_filters_postal_codes_all_zip_codes" />All Zip Codes</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05401"><input type="checkbox" value="05401" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05401" />05401</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05403"><input type="checkbox" value="05403" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05403" />05403</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05446"><input type="checkbox" value="05446" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05446" />05446</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05452"><input type="checkbox" value="05452" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05452" />05452</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05468"><input type="checkbox" value="05468" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05468" />05468</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05477"><input type="checkbox" value="05477" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05477" />05477</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05482"><input type="checkbox" value="05482" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05482" />05482</label></span><span class="form__row__control"><label for="mobile_filters_postal_codes_05495"><input type="checkbox" value="05495" name="filters[postal_codes][]" id="mobile_filters_postal_codes_05495" />05495</label></span></div></div></div>
+      </div>
+
+      <div class="grid__12">
+        <div class="form__row"><label class="form__row__label" for="mobile_filters_cats">Cats Allowed</label><div class="form__row__body"><div class="form__row__field-wrapper"><select name="filters[cats]" id="mobile_filters_cats"><option value="" label=" "></option>
+<option value="Cats allowed">Yes</option>
+<option value="Cats not allowed">No</option></select></div></div></div>
+      </div>
+      <div class="grid__12">
+        <div class="form__row"><label class="form__row__label" for="mobile_filters_dogs">Dogs Allowed</label><div class="form__row__body"><div class="form__row__field-wrapper"><select name="filters[dogs]" id="mobile_filters_dogs"><option value="" label=" "></option>
+<option value="Dogs allowed">Large</option>
+<option value="Small dogs allowed">Small</option>
+<option value="Dogs not allowed">None</option></select></div></div></div>
+        <div class="form__row"><label class="form__row__label" for="mobile_filters_desired_move_in">Desired Move In</label><div class="form__row__body"><div class="form__row__field-wrapper"><ul class="grid grid--half-gutters"><li class="grid__12"><div class="js-gears-date input-add-on"><input class="js-datepicker" type="text" name="filters[desired_move_in]" id="mobile_filters_desired_move_in" /><span class="js-datepicker-trigger input-add-on__append button"><span class="icon icon-calendar"></span></span></div></li></ul></div></div></div>
+      </div>
+    </div>
+    <div class="u-text-center">
+      <input type="submit" name="commit" value="Filter" class="filter-form-button btn btn-primary theme-color theme-color--actionable theme-color-border" data-disable-with="Filter" />
+    </div>
+  </div>
+</form>
+
+
+  <div class="map-panel js-listing-map hand-hidden u-hidden">
+    <div id="googlemap" class="map-panel__googlemap"></div>
+    <div class="map-panel__bottom-button u-text-center">
+      <a href="#" class="map-panel__bottom-button__link u-hidden js-exit-streetview-button">Exit Street View</a>
+      <a href="#" class="map-panel__bottom-button__link js-reset-map-button">Reset Map</a>
+    </div>
+  </div>
+
+
+<h1 class="text-center mt-4">Current Listings</h1>
+<p class="js-topbar-title listings__filters-title text-center m-auto">Showing all available listings</p>
+
+<div id='result_container' class="listings js-listings-container">
+  <div class="listing-item result js-listing-item" id="listing_25">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/df797ff4-f871-473b-9558-6a9ba68b0c1b" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/2dac6779-5024-4818-ac5c-e32b700bbd79/medium.jpg" alt="7 Rivendell Drive, Essex Junction, VT 05452" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $3,400
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  5 bd / 2 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$3,400</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">2,100</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">5 bd / 2 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/df797ff4-f871-473b-9558-6a9ba68b0c1b" target="_blank">Spacious 4+ Bedroom Single-Family Home in Essex Junction</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">7 Rivendell Drive, Essex Junction, VT 05452</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="25"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 2,100</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">Enjoy the space, comfort, and convenience of this well-maintained home located in a quiet Essex Junction neighborhood with easy access to schools, parks, shopping, and major employers.<br /><br />Home Features<br />•4 bedrooms plus a den that can serve as a 5th bedroom<br />•Large living room with vinyl plank floors<br />•Formal dining room with vinyl plank flooring<br />•Spacious kitchen with LG refrigerator and ice ...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Large Yard, 2-Car Garage, 3 season back porch
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Refrigerator, Dishwasher, Stove/Oven, Washer/Dryer
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/df797ff4-f871-473b-9558-6a9ba68b0c1b">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=df797ff4-f871-473b-9558-6a9ba68b0c1b&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_277">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/50a952cc-3eb4-4994-967d-b8d52c6d58f2" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/90a13dcc-97f9-4c4a-adbc-30c356b3c64b/medium.jpeg" alt="25 Sandy Shore Terrace - Unit 201, Colchester, VT 05446" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,850
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  2 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,850</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">2 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/50a952cc-3eb4-4994-967d-b8d52c6d58f2" target="_blank">2BD/1BA Apartment Colchester Bay Private Lakefront Access✨HALF OFF FIRST MONTH&#39;S RENT!✨</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">25 Sandy Shore Terrace - Unit 201, Colchester, VT 05446</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="277"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">✨HALF OFF FIRST MONTH&#39;S RENT!✨<br />YouTube Video Walkthrough: <a target="_blank" href="https://youtu.be/BA97bO2m-Hc">https://youtu.be/BA97bO2m-Hc</a><br /><br />Enjoy beautiful Lake Champlain views from this second-floor apartment in a desirable Colchester location. Residents have access to a private beach and mooring, offering a unique opportunity to enjoy lakeside living year-round.<br />This approximately 500 sq. ft. apartment features hardwood floors, a comfortab...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Private Beach
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Water/Sewer, Trash &amp; Recycling, Grounds Maintenance, Plowing, Mowing
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Refrigerator, Stove/Oven
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/50a952cc-3eb4-4994-967d-b8d52c6d58f2">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=50a952cc-3eb4-4994-967d-b8d52c6d58f2&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_370">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/22b704a2-a513-4914-8d89-988d86eb25fe" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/118e6d35-4ff1-47e9-a439-2b1eecbdc98c/medium.jpg" alt="42 Cardinal Way, Shelburne, VT 05482" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $4,500
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  4 bd / 2.5 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$4,500</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">2,239</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">4 bd / 2.5 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/22b704a2-a513-4914-8d89-988d86eb25fe" target="_blank">Beautiful 4 Bedroom Home in Shelburne&#39;s Deer Run Neighborhood | Flexible Lease Terms</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">42 Cardinal Way, Shelburne, VT 05482</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="370"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 2,239</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">✨$1,000 off first month&#39;s rent if lease starts by Oct 1st!✨<br /><br />Nestled in the highly desirable Deer Run neighborhood, this beautifully maintained 4-bedroom, 2.5-bath home offers comfort, space, and convenience in one of Shelburne&#39;s most sought-after locations. Freshly painted and filled with natural light, this home features hardwood flooring throughout the main level, a vaulted-ceiling living ...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Fireplace, In-Unit Laundry, Hardwood Flooring
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Trash &amp; Recycling, Water/Sewer, Snow Removal, Landscaping
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Dishwasher, Garbage Disposal, Washer/Dryer, Refrigerator, Gas Fireplace, Gas Stove/Oven
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/22b704a2-a513-4914-8d89-988d86eb25fe">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=22b704a2-a513-4914-8d89-988d86eb25fe&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_369">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/32e0c6fa-0deb-45e9-9b85-738c20e81824" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/1244fcf6-ae8b-4286-8402-c399cd89ac9e/medium.jpeg" alt="50 Hawthorne Circle, South Burlington, VT 05403" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $2,200
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  2 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$2,200</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">1,189</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">2 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/32e0c6fa-0deb-45e9-9b85-738c20e81824" target="_blank">Spacious 2-Bedroom Condo in South Burlington</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">50 Hawthorne Circle, South Burlington, VT 05403</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="369"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 1,189</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">Welcome home to 50 Hawthorne Circle, a spacious 2-bedroom, 1-bathroom condo in a quiet South Burlington neighborhood. This upstairs condo offers 1,189 square feet of living space, providing plenty of room to relax and make yourself at home.<br /><br />The unit has been freshly painted and features a comfortable layout with two bedrooms and a full bathroom. The treetop setting brings in natural sunlight...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> trash &amp; recycling, snow removal, Lawn Maintenance
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Washer/Dryer, Refrigerator, Electric Stove, Rinnai Heating Units
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats not allowed, Dogs not allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/32e0c6fa-0deb-45e9-9b85-738c20e81824">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=32e0c6fa-0deb-45e9-9b85-738c20e81824&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_243">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/369b24f9-bb36-4e86-b30b-5cedd850ebd2" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/d5c91ee7-2140-486c-a23c-b0d88ed3d36c/medium.jpg" alt="20 Jolina Court - Apt 204, Richmond, VT 05477" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,800
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  2 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,800</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">515</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">2 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">10/1/26</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/369b24f9-bb36-4e86-b30b-5cedd850ebd2" target="_blank">2BD/1BA In Richmond - ⭐Free Month of Rent⭐</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">20 Jolina Court - Apt 204, Richmond, VT 05477</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="243"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 515</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available 10/1/26</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">In the heart of the bucolic Richmond, Vermont, a new environmentally sustainable residential development is here. The multi-staged development offers businesses, individuals and families opportunities to live, work and play on the main street of a quaint Vermont village that is minutes from Burlington, the mountains and all major transportation. Living the Vermont life has never been more acces...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Off Street Parking, Central A/C, Storage Unit, On-Site Laundry, snow removal, Covered Parking, Trash/Recyclin/Compost...
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Hot Water, Trash &amp; Recycling, Water/Sewer, Compost Pickup, Snow Removal, Lawn Care
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Refrigerator, Electric Stove
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/369b24f9-bb36-4e86-b30b-5cedd850ebd2">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=369b24f9-bb36-4e86-b30b-5cedd850ebd2&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_253">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/fffd5e08-84b5-48d0-ba21-c005b327f97c" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/cfb7ba43-6af0-40f6-b20f-49a026cd2789/medium.jpeg" alt="30 School Street - Unit 107, Unit 107, Milton, VT 05468" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,600
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  2 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,600</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">2 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">10/1/26</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/fffd5e08-84b5-48d0-ba21-c005b327f97c" target="_blank">Quiet 2BD - 1BA (55+ COMMUNITY)</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">30 School Street - Unit 107, Unit 107, Milton, VT 05468</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="253"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available 10/1/26</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">**This property is EXCLUSIVELY for individuals who are 55 years of age or older, or for those who are disabled**<br /><br />YouTube link to virtual walkthrough: <a target="_blank" href="https://youtu.be/aDA3UOhkOxA?si=5MeCuRHoOn-hjtGx">https://youtu.be/aDA3UOhkOxA?si=5MeCuRHoOn-hjtGx</a><br />(this video is of a neighboring unit and slightly varies BUT the photos are accurate)<br /><br />Enjoy this first floor, 2 bedroom unit in this great 55+ community. This property is a renovated school. ...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Open Coin-Op Washer/Dryer
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Water/Sewer, Trash &amp; Recycling, Grounds Maintenance, Landscaping, Snow Removal
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Refrigerator, Gas Stove/Oven
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/fffd5e08-84b5-48d0-ba21-c005b327f97c">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=fffd5e08-84b5-48d0-ba21-c005b327f97c&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_45">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/4a77cd26-ff17-4a3c-8377-10aa733a2f29" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/baaf07ba-faba-448a-965e-63c57e292184/medium.jpg" alt="383 College Street - Suite 2C, Suite 2C, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,925
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  1 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,925</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">1 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">10/1/26</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/4a77cd26-ff17-4a3c-8377-10aa733a2f29" target="_blank">Fully Furnished Short or Long Term Rental in an Ideal Burlington Location</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">383 College Street - Suite 2C, Suite 2C, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="45"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available 10/1/26</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">This move in ready, fully furnished 1BD/1BA apartment offers a comfortable and convenient living experience just minutes from UVM Medical Center, Champlain College, and Burlington’s Waterfront Park.<br /><br />The unit is thoughtfully set up with everything you need, including a mattress, sofa, TV, and kitchenware, making it easy to settle in right away. Air conditioning is included for the warmer mont...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Includes Everything
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/4a77cd26-ff17-4a3c-8377-10aa733a2f29">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=4a77cd26-ff17-4a3c-8377-10aa733a2f29&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_212">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/54e9fa30-e28c-4bf9-bdce-28621fadb79a" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/6835f7fb-d9d4-4e9d-8ad2-190df15cecb2/medium.jpg" alt="20 Jolina Court - Apt 304, Richmond, VT 05477" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,850
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  2 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,850</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">515</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">2 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/54e9fa30-e28c-4bf9-bdce-28621fadb79a" target="_blank">2BD/1BA In Richmond - ⭐Free Month of Rent⭐</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">20 Jolina Court - Apt 304, Richmond, VT 05477</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="212"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 515</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">In the heart of the bucolic Richmond, Vermont, a new environmentally sustainable residential development is here. The multi-staged development offers businesses, individuals and families opportunities to live, work and play on the main street of a quaint Vermont village that is minutes from Burlington, the mountains and all major transportation. Living the Vermont life has never been more acces...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Snow Removal, Central A/C, Storage Unit, On-Site Laundry, Covered Parking, Trash/Recyclin/Composting Pick-up
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Hot Water, Water/Sewer, Trash, Recycling, Snow Removal, Lawn Care
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Refrigerator, Range/Oven, Microwave, Plunger
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/54e9fa30-e28c-4bf9-bdce-28621fadb79a">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=54e9fa30-e28c-4bf9-bdce-28621fadb79a&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_87">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/db86131b-525a-40d5-be79-502d84139b3a" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/b4675382-bf9b-4b83-bffb-67a6f4bf8aa8/medium.jpg" alt="383 College Street - Suite 2E, Suite 2E, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,800
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  Studio / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,800</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">Studio / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/db86131b-525a-40d5-be79-502d84139b3a" target="_blank">Short OR Long Term Fully Furnished Studio</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">383 College Street - Suite 2E, Suite 2E, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="87"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">Conveniently located near UVM Medical Center, Champlain College and Burlington’s Waterfront Park. Rent includes all utilities, Wi-Fi and 1 parking space. Street parking is available. Unit furnishings include a queen size murphy bed, sofa, TV and kitchen/kitchenette. Unit has A/C, and coin-operated laundry in the building. Please note: furnishings may vary. If you are staying short-term, there i...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Includes Everything
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> ALL UTILITIES INCLUDED
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/db86131b-525a-40d5-be79-502d84139b3a">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=db86131b-525a-40d5-be79-502d84139b3a&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_43">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/4d2f1787-a4a9-46f8-92c0-25afe6d20c3b" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/4598e2b2-3bef-49cf-8999-eac9f1491753/medium.jpg" alt="383 College Street - Suite 2D, Suite 2D, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $2,500
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  2 bd / 2 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$2,500</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">2 bd / 2 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/4d2f1787-a4a9-46f8-92c0-25afe6d20c3b" target="_blank">Fully Furnished 2BD Short OR Long Term Lease!</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">383 College Street - Suite 2D, Suite 2D, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="43"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">This move-in-ready, fully furnished 2BD/2BA apartment offers a comfortable and convenient living experience just minutes from UVM Medical Center, Champlain College, and Burlington’s Waterfront Park.<br /><br />The unit is thoughtfully set up with everything you need, including a mattress, sofa, TV, and kitchenware, making it easy to settle in right away. Air conditioning is included for the warmer mont...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Includes Everything
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/4d2f1787-a4a9-46f8-92c0-25afe6d20c3b">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=4d2f1787-a4a9-46f8-92c0-25afe6d20c3b&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_64">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/6b844dec-3adc-4450-9ede-2c782bc5daa5" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/c142b5d9-65df-4910-be09-e5e73b7c2c08/medium.jpg" alt="383 College Street - Suite 3D, Suite 3D, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $2,500
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  2 bd / 2 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$2,500</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">2 bd / 2 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/6b844dec-3adc-4450-9ede-2c782bc5daa5" target="_blank">Short OR Long Term Fully Furnished Third Floor Unit 2BD/2BA</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">383 College Street - Suite 3D, Suite 3D, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="64"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">This move-in-ready, fully furnished 2BD/2BA apartment offers a comfortable and convenient living experience just minutes from UVM Medical Center, Champlain College, and Burlington’s Waterfront Park.<br /><br />The unit is thoughtfully set up with everything you need, including a mattress, sofa, TV, and kitchenware, making it easy to settle in right away. Air conditioning is included for the warmer mont...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Includes Everything
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Heat, A/C, Internet/Wifi, Water/Sewer, Trash &amp; Recycling, Electric
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Stove/Oven, Microwave, Refrigerator
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Small dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/6b844dec-3adc-4450-9ede-2c782bc5daa5">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=6b844dec-3adc-4450-9ede-2c782bc5daa5&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_366">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/37c1a108-996f-4959-9df4-86a2f5c48eea" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/60529eb6-45f6-498b-aa9b-739e73f405f6/medium.jpg" alt="59 Goose Creek Road, St. George, VT 05495" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $2,400
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  3 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$2,400</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">1,500</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">3 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/37c1a108-996f-4959-9df4-86a2f5c48eea" target="_blank">Fully Furnished 3BR Home with Land – Minutes to Burlington - Half Off First Month&#39;s Rent!</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">59 Goose Creek Road, St. George, VT 05495</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="366"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 1,500</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">Fully furnished, well-appointed 3-bedroom ranch on a private 0.75-acre lot. Enjoy two decks, plenty of space to read or to work, and easy, move-in-ready living in a quiet setting.<br /><br />Close to Burlington and Williston, offering the convenience of city access with the rural charm of classic Vermont living.<br /><br />Near many of Chittenden County’s major employers, including:<br /><br />UVM Medical Center <br />Uni...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> Open Parking, On-Site Laundry, Yard Space
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Cable/wifi, Electricity
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Dishwasher, Electric Stove, Washer/Dryer
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats not allowed, Dogs not allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/37c1a108-996f-4959-9df4-86a2f5c48eea">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=37c1a108-996f-4959-9df4-86a2f5c48eea&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_51">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/991b0e60-c09a-4d4d-b3ba-67885dc52114" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/314b7368-46c0-402b-af26-7685b4391c99/medium.jpg" alt="64 Grant Street, Apt 3, Apt 3, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,500
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  1 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,500</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">350</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">1 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/991b0e60-c09a-4d4d-b3ba-67885dc52114" target="_blank">1BD/1BA Apartment in the Heart of Burlington✨HALF OFF FIRST MONTH&#39;S RENT!✨</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">64 Grant Street, Apt 3, Apt 3, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="51"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 350</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">✨HALF OFF FIRST MONTH&#39;S RENT!✨<br />Are you looking for a perfect place to live in the heart of Burlington, Vermont? Look no further! This 1 bedroom apartment is the ideal downtown home - featuring everything you need in a city dwelling, all in one convenient package. Enjoy space and privacy, complete with new vinyl flooring in the kitchen and bathroom, and lots of natural light from the windows. P...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Utilities Included:</span> Water/Sewer, Trash &amp; Recycling
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Stove/Oven, Refrigerator
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/991b0e60-c09a-4d4d-b3ba-67885dc52114">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=991b0e60-c09a-4d4d-b3ba-67885dc52114&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_112">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/5654e603-381d-43c2-949d-9c76c727a304" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/0d6ea088-bbfa-4ab9-acf2-3a68f2a53260/medium.jpg" alt="180 Elmwood Ave, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $1,600
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  1 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$1,600</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">600</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">1 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/5654e603-381d-43c2-949d-9c76c727a304" target="_blank">1BD/1BA in ONE, Burlington!</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">180 Elmwood Ave, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="112"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 600</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">This spacious first-floor 1-bedroom apartment offers a comfortable layout with a large kitchen, generously sized living room, and abundant natural light throughout. With a private entrance and private deck, the unit provides a welcoming space to relax and enjoy at home.<br /><br />The apartment features ample living space, and a practical floor plan that offers both comfort and functionality.<br /><br />Conven...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Amenities:</span> High Ceilings, Porch, Large Rooms
+          <br>
+        <span style="font-weight:bold">Utilities Included:</span> Water/Sewer, Trash &amp; Recycling, Grounds Maintenance, Plowing
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Refrigerator, Stove/Oven
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/5654e603-381d-43c2-949d-9c76c727a304">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=5654e603-381d-43c2-949d-9c76c727a304&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_41">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/36040a10-e965-4cb1-a4f2-49fb084a05c5" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/a4f7660f-7a76-4486-b939-7ae683c4a30c/medium.jpg" alt="58-60 Intervale Avenue - 58 Intervale Avenue, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $2,400
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  3 bd / 1 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$2,400</dd>
+        </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Square Feet</dt>
+          <dd class="detail-box__value">1,368</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">3 bd / 1 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/36040a10-e965-4cb1-a4f2-49fb084a05c5" target="_blank">Beautifully Updated 3BR Home with Ample Living Space</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">58-60 Intervale Avenue - 58 Intervale Avenue, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="41"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+        <span class="u-space-rm js-listing-square-feet desk-hidden tablet-hidden" style="display: inline-block">Square Feet: 1,368</span>
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">58–60 Intervale Avenue, Burlington, VT 05401<br />3 bed / 1 bath<br />Available Now<br />$2,400/mo<br />Cats allowed; dogs allowed<br /><br />Key Features<br />Large three‑bedroom, one‑bath home<br /><br />1,368 sq. ft. of interior space<br /><br />Beautifully updated interior finishes<br /><br />Defined living room, dining room, and kitchen<br /><br />Bright interior with multiple windows<br /><br />One off‑street parking space<br /><br />Water, sewer, trash, and recy...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Utilities Included:</span> Water/Sewer, Trash &amp; Recycling
+      <br>
+        <span class="js-listing-pet-policy"><span style="font-weight:bold">Pet Policy:</span> Cats allowed, Dogs allowed</span>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/36040a10-e965-4cb1-a4f2-49fb084a05c5">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=36040a10-e965-4cb1-a4f2-49fb084a05c5&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+<div class="listing-item result js-listing-item" id="listing_248">
+  <div class="listing-item__figure-container">
+    <a href="/listings/detail/d024a9bd-8ceb-4fc1-90d9-212a136377e3" target="_blank">
+      <div class="listing-item__figure">
+        <img class="listing-item__image is-placeholder lazy js-listing-image " data-original="https://images.cdn.appfolio.com/rpmvt001/images/ad992ffb-bd9c-44f7-8502-0df4ebb9af06/medium.jpg" alt="15-17 Peru Street - Unit 15, Burlington, VT 05401" src="https://listings.cdn.appfolio.com/listings/assets/listings/rental_listing/place_holder-ea9e892a45f62e048771a4b22081d1eed003a21f0658a92aa5abcfd357dd4699.png" />
+        <div class="listing-item__blurb js-listing-item-blurb tablet-hidden desk-hidden">
+          <div class="listing-item__blurb__left">
+              <div class="listing-item__facts u-inline-block">
+                    <div class="rent-banner__header">RENT</div>
+                    <div class="sidebar__price rent-banner__text js-listing-blurb-rent">
+                      $2,300
+                    </div>
+              </div>
+          </div><!-- No Space Here
+       --><div class="listing-item__blurb__right">
+              <div class="u-float-right">
+                <div class="rent-banner__header">BED / BATH</div>
+                <span class="rent-banner__text js-listing-blurb-bed-bath">
+                  3 bd / 1.5 ba
+                </span>
+              </div>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="listing-item__body">
+    <div class="detail-box hand-hidden u-space-bs js-listing-quick-facts">
+      <dl>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">RENT</dt>
+          <dd class="detail-box__value">$2,300</dd>
+        </div>
+          <div class="detail-box__item">
+            <dt class="detail-box__label">Bed / Bath</dt>
+            <dd class="detail-box__value">3 bd / 1.5 ba</dd>
+          </div>
+        <div class="detail-box__item">
+          <dt class="detail-box__label">Available</dt>
+          <dd class="detail-box__value js-listing-available">NOW</dd>
+        </div>
+      </dl>
+    </div>
+
+      <h2 class="listing-item__title js-listing-title">
+        <a href="/listings/detail/d024a9bd-8ceb-4fc1-90d9-212a136377e3" target="_blank">Renovated 3BR with Hardwood Floors, Laundry, and Off‑Street Parking</a>
+      </h2>
+    <p class="u-space-an">
+      <span class="u-pad-rm js-listing-address">15-17 Peru Street - Unit 15, Burlington, VT 05401</span>
+        <a href="#" class="hand-hidden js-listing-map-view-link listing-item__map-link" data-listing-id="248"><span class="fa-solid fa-location-dot"></span>&nbsp;Map</a>
+    </p>
+
+    <p class="u-space-an">
+
+
+
+
+          <span class="js-listing-available tablet-hidden desk-hidden" style="display: inline-block">Available Now</span>
+    </p>
+    <p class="hand-hidden tablet-hidden u-space-ts js-listing-description">This split‑level three‑bedroom, 1.5‑bath apartment offers a spacious interior with hardwood flooring throughout and recently renovated bathrooms that add a modern touch to the classic layout. The multi‑level design provides defined living areas, and the included washer and dryer offer added convenience.<br /><br />Two off‑street parking spaces are provided, which is a valuable feature in this central B...</p>
+    <p class="hand-hidden tablet-hidden">
+        <span style="font-weight:bold">Utilities Included:</span> Trash &amp; Recycling, Water/Sewer, Grounds Maintenance, Plowing
+          <br>
+        <span style="font-weight:bold">Appliances:</span> Refrigerator, Stove/Oven, Washer/Dryer
+      <br>
+    </p>
+  </div>
+
+  <div class="listing-item__actions js-listing-actions">
+    <a target="_blank" class="btn btn-secondary js-link-to-detail" href="/listings/detail/d024a9bd-8ceb-4fc1-90d9-212a136377e3">View Details</a>
+      <a target="_blank" class="btn btn-primary theme-color theme-color--actionable js-listing-apply" href="/listings/rental_applications/new?listable_uid=d024a9bd-8ceb-4fc1-90d9-212a136377e3&amp;source=Website">Apply Now</a>
+  </div>
+</div>
+
+<div class='listings__page-buttons'>
+  
+</div>
+
+
+<div class='no_vacancies u-hidden listings__no-vacancies'>No vacancies found matching your search criteria.</div>
+
+
+</div>
+
+  </main>
+
+  <script src="https://listings.cdn.appfolio.com/listings/assets/listings/application2-b0f197292ab612d566f03b2fce507933939f13cd8dab7bb1c4befcee8f024506.js"></script>
+    <script type="text/javascript" charset="utf-8" src="https://maps.googleapis.com/maps/api/js?client=gme-appfolio&amp;v=3.37"></script>
+  <script type="text/javascript">
+    window.PARENTIFRAMEID = "noframe";
+    window.googleMap = new GoogleMap({
+      container: 'googlemap',
+      markers: [{"latitude":44.48577,"longitude":-73.096458,"address":"7 Rivendell Drive, Essex Junction, VT 05452","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/2dac6779-5024-4818-ac5c-e32b700bbd79/large.jpg","rent_range":"$3,400","unit_specs":"5 bd, 2 ba, 2,100 Sq. Ft.","listing_id":25,"detail_page_url":"/listings/detail/df797ff4-f871-473b-9558-6a9ba68b0c1b","zoomed_in":false},{"latitude":44.5471155,"longitude":-73.202946,"address":"25 Sandy Shore Terrace - Unit 201, Colchester, VT 05446","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/90a13dcc-97f9-4c4a-adbc-30c356b3c64b/large.jpeg","rent_range":"$1,850","unit_specs":"2 bd, 1 ba","listing_id":277,"detail_page_url":"/listings/detail/50a952cc-3eb4-4994-967d-b8d52c6d58f2","zoomed_in":false},{"latitude":44.3956703,"longitude":-73.2126784,"address":"42 Cardinal Way, Shelburne, VT 05482","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/118e6d35-4ff1-47e9-a439-2b1eecbdc98c/large.jpg","rent_range":"$4,500","unit_specs":"4 bd, 2.5 ba, 2,239 Sq. Ft.","listing_id":370,"detail_page_url":"/listings/detail/22b704a2-a513-4914-8d89-988d86eb25fe","zoomed_in":false},{"latitude":44.4608733,"longitude":-73.1580947,"address":"50 Hawthorne Circle, South Burlington, VT 05403","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/1244fcf6-ae8b-4286-8402-c399cd89ac9e/large.jpeg","rent_range":"$2,200","unit_specs":"2 bd, 1 ba, 1,189 Sq. Ft.","listing_id":369,"detail_page_url":"/listings/detail/32e0c6fa-0deb-45e9-9b85-738c20e81824","zoomed_in":false},{"latitude":44.4034825,"longitude":-72.9939891,"address":"20 Jolina Court - Apt 204, Richmond, VT 05477","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/d5c91ee7-2140-486c-a23c-b0d88ed3d36c/large.jpg","rent_range":"$1,800","unit_specs":"2 bd, 1 ba, 515 Sq. Ft.","listing_id":243,"detail_page_url":"/listings/detail/369b24f9-bb36-4e86-b30b-5cedd850ebd2","zoomed_in":false},{"latitude":44.6620891,"longitude":-73.1240103,"address":"30 School Street - Unit 107, Unit 107, Milton, VT 05468","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/cfb7ba43-6af0-40f6-b20f-49a026cd2789/large.jpeg","rent_range":"$1,600","unit_specs":"2 bd, 1 ba","listing_id":253,"detail_page_url":"/listings/detail/fffd5e08-84b5-48d0-ba21-c005b327f97c","zoomed_in":false},{"latitude":44.4772837,"longitude":-73.2044034,"address":"383 College Street - Suite 2C, Suite 2C, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/baaf07ba-faba-448a-965e-63c57e292184/large.jpg","rent_range":"$1,925","unit_specs":"1 bd, 1 ba","listing_id":45,"detail_page_url":"/listings/detail/4a77cd26-ff17-4a3c-8377-10aa733a2f29","zoomed_in":false},{"latitude":44.4034825,"longitude":-72.9939891,"address":"20 Jolina Court - Apt 304, Richmond, VT 05477","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/6835f7fb-d9d4-4e9d-8ad2-190df15cecb2/large.jpg","rent_range":"$1,850","unit_specs":"2 bd, 1 ba, 515 Sq. Ft.","listing_id":212,"detail_page_url":"/listings/detail/54e9fa30-e28c-4bf9-bdce-28621fadb79a","zoomed_in":false},{"latitude":44.4772837,"longitude":-73.2044034,"address":"383 College Street - Suite 2E, Suite 2E, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/b4675382-bf9b-4b83-bffb-67a6f4bf8aa8/large.jpg","rent_range":"$1,800","unit_specs":"Studio, 1 ba","listing_id":87,"detail_page_url":"/listings/detail/db86131b-525a-40d5-be79-502d84139b3a","zoomed_in":false},{"latitude":44.4772837,"longitude":-73.2044034,"address":"383 College Street - Suite 2D, Suite 2D, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/4598e2b2-3bef-49cf-8999-eac9f1491753/large.jpg","rent_range":"$2,500","unit_specs":"2 bd, 2 ba","listing_id":43,"detail_page_url":"/listings/detail/4d2f1787-a4a9-46f8-92c0-25afe6d20c3b","zoomed_in":false},{"latitude":44.4772837,"longitude":-73.2044034,"address":"383 College Street - Suite 3D, Suite 3D, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/c142b5d9-65df-4910-be09-e5e73b7c2c08/large.jpg","rent_range":"$2,500","unit_specs":"2 bd, 2 ba","listing_id":64,"detail_page_url":"/listings/detail/6b844dec-3adc-4450-9ede-2c782bc5daa5","zoomed_in":false},{"latitude":44.3896022,"longitude":-73.1264936,"address":"59 Goose Creek Road, St. George, VT 05495","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/60529eb6-45f6-498b-aa9b-739e73f405f6/large.jpg","rent_range":"$2,400","unit_specs":"3 bd, 1 ba, 1,500 Sq. Ft.","listing_id":366,"detail_page_url":"/listings/detail/37c1a108-996f-4959-9df4-86a2f5c48eea","zoomed_in":false},{"latitude":44.4758825,"longitude":-73.212072,"address":"64 Grant Street, Apt 3, Apt 3, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/314b7368-46c0-402b-af26-7685b4391c99/large.jpg","rent_range":"$1,500","unit_specs":"1 bd, 1 ba, 350 Sq. Ft.","listing_id":51,"detail_page_url":"/listings/detail/991b0e60-c09a-4d4d-b3ba-67885dc52114","zoomed_in":false},{"latitude":44.4855437,"longitude":-73.2136058,"address":"180 Elmwood Ave, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/0d6ea088-bbfa-4ab9-acf2-3a68f2a53260/large.jpg","rent_range":"$1,600","unit_specs":"1 bd, 1 ba, 600 Sq. Ft.","listing_id":112,"detail_page_url":"/listings/detail/5654e603-381d-43c2-949d-9c76c727a304","zoomed_in":false},{"latitude":44.486174,"longitude":-73.212487,"address":"58-60 Intervale Avenue - 58 Intervale Avenue, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/a4f7660f-7a76-4486-b939-7ae683c4a30c/large.jpg","rent_range":"$2,400","unit_specs":"3 bd, 1 ba, 1,368 Sq. Ft.","listing_id":41,"detail_page_url":"/listings/detail/36040a10-e965-4cb1-a4f2-49fb084a05c5","zoomed_in":false},{"latitude":44.482309,"longitude":-73.216852,"address":"15-17 Peru Street - Unit 15, Burlington, VT 05401","default_photo_url":"https://images.cdn.appfolio.com/rpmvt001/images/ad992ffb-bd9c-44f7-8502-0df4ebb9af06/large.jpg","rent_range":"$2,300","unit_specs":"3 bd, 1.5 ba","listing_id":248,"detail_page_url":"/listings/detail/d024a9bd-8ceb-4fc1-90d9-212a136377e3","zoomed_in":false}],
+      infoWindowTemplate:  _.template('<div class=\'map-popup\' id=\'map-popup-<%= listing_id %>\'>\n\n  <div class=\"map-popup-thumbnail\">\n    <a href=\"<%= detail_page_url %>\" target=\"_blank\"><img src=\'<%= default_photo_url %>\' width=\'144\'/><\/a>\n  <\/div>\n\n  <div class=\"map-popup-info\">\n    <p class=\"map-zoom-link-container\"><a href=\'#\' class=<%= zoomed_in ? \'js-map-zoom-out-link\' : \'js-map-zoom-in-link\' %> listing-id=\"<%= listing_id%>\"><%= zoomed_in ? \'Zoom Out\' : \'Zoom In\'%><\/a><\/p>\n    <h3 class=\"map-popup-rent\"><%= rent_range %><\/h3>\n    <p class=\"map-popup-specs\"><%= unit_specs %><\/p>\n    <p class=\"map-popup-address\"><%= address %><\/p>\n\n    <p>\n      <a href=\"<%= detail_page_url %>\" target=\"_blank\" class=\"btn btn-secondary btn-sm pt-1 pb-1\">Details<\/a>\n      <a href=\'#\' class=\'btn btn-secondary btn-sm pt-1 pb-1 js-street-view-link\' latitude=\'<%= latitude %>\' longitude=<%= longitude %>>Street View<\/a>\n      <a href=\'https://maps.google.com/maps?daddr=<%= address %>&saddr=\' target=\'_blank\' class=\'btn btn-secondary btn-sm pt-1 pb-1 directions-link\'>Directions<\/a>\n    <\/p>\n  <\/div>\n<\/div>\n'),
+      onChange: ListingIndexMap.filterListings,
+      onMarkerClick: ListingIndexMap.expandMapAndMoveListingToTop
+    });
+
+    listingManagerInstance = new listings.listingsManager('.js-listings-container', '.js-filter-form', '#filters_order_by');
+    listingManagerInstanceMobile = new listings.listingsManager('.js-listings-container', '.js-mobile-filter-form', '#mobile_filters_order_by');
+    
+    // Initialize popovers
+    $(document).ready(function() {
+      $('.js-popover').each(function() {
+        new Gears.ui.Popover(this);
+      });
+    });
+  </script>
+
+
+  <script src="https://public.cdn.appfolio.com/public/assets/scripts/bootstrap/5.3.1/bootstrap.bundle.min.js"></script>
+
+  <footer id="footer" class="cross-section footer">
+    <div class="cross-section__aside">
+  <figure class="footer__powered-by hand-hidden tablet-hidden"></figure>
+</div>
+<div class="cross-section__main">
+  <div class="footer__inner">
+    <span class="hand-hidden tablet-hidden footer__equal-housing"></span>
+    <div class="footer__privacy-policy">
+      All information provided will be treated in accordance with our <a target="_blank" href="https://www.appfolio.com/privacy">Privacy Policy</a> and <a target="_blank" href="https://www.appfolio.com/terms/listings">Terms of Service</a>.
+    </div>
+    <span class="desk-hidden footer__equal-housing"></span>
+    <span class="desk-hidden footer__powered-by"></span>
+  </div>
+</div>
+
+  </footer>
+
+</body>
+</html>
