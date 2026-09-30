@@ -40,7 +40,8 @@ def test_scrape_due_enqueues_only_due_sources(cfg):
         s.add(make(id="due", last_run_at=now - timedelta(hours=2)))
         s.add(make(id="fresh", last_run_at=now))
         s.add(make(id="off", enabled=False))
+        s.add(make(id="new"))  # never run: due immediately
     j = runner.run_inline("scrape_due", cfg=cfg)
-    assert j.result == {"queued": ["due"]}
+    assert j.result == {"queued": ["due", "new"]}
     with session_scope(cfg) as s:
-        assert [x.source_id for x in s.query(Job).filter_by(kind="scrape")] == ["due"]
+        assert [x.source_id for x in s.query(Job).filter_by(kind="scrape")] == ["due", "new"]

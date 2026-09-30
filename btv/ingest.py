@@ -194,8 +194,8 @@ def scrape_due(ctx: JobContext, **_ignored) -> dict:
     queued = []
     with session_scope(ctx.cfg) as s:
         now = utcnow()
-        due = [src.id for src in s.query(Source).filter(Source.enabled.is_(True)).all()
-               if (nd := next_due(src)) is not None and nd <= now]
+        due = [src.id for src in s.query(Source).filter(Source.enabled.is_(True)).order_by(Source.id).all()
+               if src.last_run_at is None or ((nd := next_due(src)) is not None and nd <= now)]
     for sid in due:
         enqueue("scrape", source_id=sid, cfg=ctx.cfg)
         queued.append(sid)
