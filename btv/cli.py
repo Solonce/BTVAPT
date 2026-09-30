@@ -25,6 +25,8 @@ settings_app = typer.Typer(no_args_is_help=True, help="View/change runtime setti
 app.add_typer(sources_app, name="sources")
 app.add_typer(settings_app, name="settings")
 console = Console()
+# Progress bars go to stderr so `--json` output on stdout stays parseable.
+progress_console = Console(stderr=True)
 
 
 def _dump(obj) -> None:
@@ -39,7 +41,7 @@ def _progress() -> Progress:
         TextColumn("{task.completed:.0f}/{task.total}"),
         TimeElapsedColumn(),
         TextColumn("[dim]{task.fields[step]}"),
-        console=console,
+        console=progress_console,
     )
 
 

@@ -22,7 +22,8 @@ from btv.db import session_factory, session_scope, utcnow
 from btv.health import assess_run
 from btv.http import PoliteClient
 from btv.jobs.runner import JobContext, job
-from btv.models import ListingSnapshot, ScrapeRun, Source, SourceListing, StatusEvent
+from btv.models import Building, ListingSnapshot, ScrapeRun, Source, SourceListing, StatusEvent
+from btv.pipeline import process_snapshot
 from btv.sources.base import Fetcher, ParsedListing, get_adapter_class
 
 
@@ -82,6 +83,9 @@ def upsert_listing(session: Session, source: Source, run_id: int | None, pl: Par
         session.flush()
         sl.latest_snapshot_id = snap.id
         created = True
+        process_snapshot(session, sl, snap, source)
+    elif sl.unit_id is None and latest is not None:
+        process_snapshot(session, sl, latest, source)
     return sl, created
 
 
@@ -169,6 +173,10 @@ def scrape(ctx: JobContext, source_id: str, **_ignored) -> dict:
             source.last_status, source.last_error = "unhealthy", run.health_notes
             ctx.log(f"health check failed: {run.health_notes}", level="warn")
         session.commit()
+        if session.query(Building).filter(Building.lat.is_(None), Building.geocode_source.is_(None)).count():
+            from btv.jobs.runner import enqueue
+
+            enqueue("geocode", cfg=cfg)
         return {"scrape_run_id": run.id, "listings": len(seen), "new_snapshots": created,
                 "healthy": healthy, "problems": problems, **misses}
     finally:

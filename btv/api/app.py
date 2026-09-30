@@ -12,6 +12,7 @@ from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+from btv import actions, views
 from btv import settings as user_settings
 from btv.config import Config, get_config
 from btv.db import init_db, session_scope
@@ -145,6 +146,134 @@ def create_app(cfg: Config | None = None, start_worker: bool = True) -> FastAPI:
             except (KeyError, ValueError) as exc:
                 raise HTTPException(400, str(exc)) from exc
             return user_settings.get_all(s)
+
+    # ------------------------------------------------------------ units
+    def _act(fn):
+        try:
+            return fn()
+        except actions.ActionError as exc:
+            raise HTTPException(400, str(exc)) from exc
+
+    @app.get("/api/units")
+    def units(include_gone: bool = False, match: str | None = None, min_rent: int | None = None,
+              max_rent: int | None = None, min_beds: float | None = None, tag: str | None = None,
+              city: str | None = None, q: str | None = None):
+        """All units with effective availability; filters are optional conveniences."""
+        with session_scope(cfg) as s:
+            data = views.list_units(s, include_gone=include_gone)
+        us = data["units"]
+        if match:
+            wanted = set(match.split(","))
+            us = [u for u in us if u["availability"]["match"] in wanted]
+        if min_rent is not None:
+            us = [u for u in us if u["rent"] is None or u["rent"] >= min_rent]
+        if max_rent is not None:
+            us = [u for u in us if u["rent"] is None or u["rent"] <= max_rent]
+        if min_beds is not None:
+            us = [u for u in us if u["beds"] is not None and u["beds"] >= min_beds]
+        if tag:
+            us = [u for u in us if tag.lower() in u["tags"]]
+        if city:
+            us = [u for u in us if (u["city"] or "").lower() == city.lower()]
+        if q:
+            ql = q.lower()
+            us = [u for u in us if ql in " ".join(str(x) for x in (u["address"], u["title"], u["unit"],
+                                                                   " ".join(u["amenities"]))).lower()]
+        data["units"], data["count"] = us, len(us)
+        return data
+
+    @app.get("/api/units/{unit_id}")
+    def unit(unit_id: int):
+        with session_scope(cfg) as s:
+            d = views.unit_detail(s, unit_id)
+            if d is None:
+                raise HTTPException(404, "no such unit")
+            return d
+
+    @app.put("/api/units/{unit_id}/prefs")
+    def unit_prefs(unit_id: int, values: dict = Body(...)):
+        allowed = {k: v for k, v in values.items() if k in ("rating", "status", "notes")}
+        with session_scope(cfg) as s:
+            p = _act(lambda: actions.set_prefs(s, unit_id, **allowed))
+            return {"rating": p.rating, "status": p.status, "notes": p.notes}
+
+    @app.post("/api/units/{unit_id}/tags")
+    def unit_add_tag(unit_id: int, tag: str = Body(..., embed=True)):
+        with session_scope(cfg) as s:
+            return {"tags": _act(lambda: actions.add_tag(s, unit_id, tag))}
+
+    @app.delete("/api/units/{unit_id}/tags/{tag}")
+    def unit_remove_tag(unit_id: int, tag: str):
+        with session_scope(cfg) as s:
+            return {"tags": _act(lambda: actions.remove_tag(s, unit_id, tag))}
+
+    @app.get("/api/tags")
+    def tags():
+        with session_scope(cfg) as s:
+            return actions.all_tags(s)
+
+    @app.post("/api/units/merge")
+    def units_merge(into_id: int = Body(...), merged_id: int = Body(...), reason: str | None = Body(None)):
+        with session_scope(cfg) as s:
+            log = _act(lambda: actions.merge_units(s, into_id, merged_id, reason))
+            return {"merge_id": log.id, "unit_id": into_id}
+
+    @app.post("/api/listings/{source_listing_id}/unlink")
+    def listing_unlink(source_listing_id: int, reason: str | None = Body(None, embed=True)):
+        with session_scope(cfg) as s:
+            log = _act(lambda: actions.unlink_listing(s, source_listing_id, reason))
+            return {"merge_id": log.id, "unit_id": log.subject["to_unit_id"]}
+
+    @app.post("/api/merges/{merge_id}/undo")
+    def merge_undo(merge_id: int):
+        with session_scope(cfg) as s:
+            log = _act(lambda: actions.undo(s, merge_id))
+            return {"merge_id": log.id, "undone_at": runner._iso(log.undone_at)}
+
+    # --------------------------------------------------------- contacts
+    @app.get("/api/contacts")
+    def contacts(multi_only: bool = False):
+        with session_scope(cfg) as s:
+            rows = views.list_contacts(s)
+        return [r for r in rows if r["multi_property"]] if multi_only else rows
+
+    @app.get("/api/contacts/{contact_id}")
+    def contact(contact_id: int):
+        with session_scope(cfg) as s:
+            d = views.contact_detail(s, contact_id)
+            if d is None:
+                raise HTTPException(404, "no such contact")
+            return d
+
+    @app.put("/api/contacts/{contact_id}")
+    def contact_update(contact_id: int, notes: str | None = Body(None), name: str | None = Body(None)):
+        with session_scope(cfg) as s:
+            c = _act(lambda: actions.set_contact_notes(s, contact_id, notes, name))
+            return {"id": c.id, "name": c.display_name, "notes": c.notes}
+
+    @app.post("/api/contacts/{contact_id}/outreach")
+    def contact_outreach(contact_id: int, values: dict = Body(...)):
+        with session_scope(cfg) as s:
+            o = _act(lambda: actions.add_outreach(s, contact_id, **{k: v for k, v in values.items() if k in (
+                "channel", "direction", "summary", "outcome", "follow_up_on", "unit_id")}))
+            return {"id": o.id}
+
+    @app.post("/api/contacts/merge")
+    def contacts_merge(into_id: int = Body(...), merged_id: int = Body(...), reason: str | None = Body(None)):
+        with session_scope(cfg) as s:
+            log = _act(lambda: actions.merge_contacts(s, into_id, merged_id, reason))
+            return {"merge_id": log.id}
+
+    @app.post("/api/mentions/{mention_id}/review")
+    def mention_review(mention_id: int, decision: str = Body(..., embed=True)):
+        with session_scope(cfg) as s:
+            m = _act(lambda: actions.review_mention(s, mention_id, decision))
+            return {"id": m.id, "review_state": m.review_state}
+
+    @app.get("/api/companies")
+    def companies():
+        with session_scope(cfg) as s:
+            return views.list_companies(s)
 
     # ----------------------------------------------------------- static
     @app.get("/", include_in_schema=False)

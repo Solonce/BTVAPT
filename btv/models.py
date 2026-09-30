@@ -208,6 +208,8 @@ class SourceListing(Base):
     last_seen: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     last_verified: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     consecutive_misses: Mapped[int] = mapped_column(Integer, default=0)
+    # Set when the user links/unlinks by hand; auto-linking then leaves it alone.
+    link_locked: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
     latest_snapshot_id: Mapped[int | None] = mapped_column(
         ForeignKey("listing_snapshots.id", use_alter=True, name="fk_sl_latest_snapshot")
     )
@@ -313,6 +315,8 @@ class ContactMention(Base):
 
     __tablename__ = "contact_mentions"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    source_listing_id: Mapped[int | None] = mapped_column(ForeignKey("source_listings.id"), index=True)
+    suggested_contact_id: Mapped[int | None] = mapped_column(ForeignKey("contacts.id"))
     snapshot_id: Mapped[int] = mapped_column(ForeignKey("listing_snapshots.id"), index=True)
     contact_id: Mapped[int | None] = mapped_column(ForeignKey("contacts.id"), index=True)
     company_id: Mapped[int | None] = mapped_column(ForeignKey("companies.id"), index=True)

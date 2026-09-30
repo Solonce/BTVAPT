@@ -54,7 +54,9 @@ def registered_kinds() -> list[str]:
 def _load_builtin_jobs() -> None:
     # Import modules that register jobs via @job.
     import btv.backup  # noqa: F401
+    import btv.geocode  # noqa: F401
     import btv.ingest  # noqa: F401
+    import btv.pipeline  # noqa: F401
 
 
 class JobContext:
