@@ -147,7 +147,7 @@ def unit_summary(ctx: Ctx, unit_id: int) -> dict | None:
         "address": b.display_address if b else None,
         "building_name": b.name if b else None,
         "city": (b.city or "").title() if b else None,
-        "unit": unit.unit_label or unit.norm_unit or None,
+        "unit": (unit.unit_label or unit.norm_unit or "").lstrip("#").strip() or None,
         "lat": b.lat if b else None,
         "lon": b.lon if b else None,
         "status": status,
@@ -288,8 +288,11 @@ def contact_card(s: Session, contact_id: int) -> dict:
     c = s.get(Contact, contact_id)
     points = s.query(ContactPoint).filter_by(contact_id=contact_id).all()
     company = s.get(Company, c.company_id) if c.company_id else None
+    name = c.display_name
+    if company and name and (name.startswith(("(", "+")) or "@" in name):
+        name = f"{company.name} {'office' if name.startswith(('(', '+')) else 'email'}"
     return {
-        "id": c.id, "name": c.display_name, "role": c.role,
+        "id": c.id, "name": name, "role": c.role,
         "company": company.name if company else None, "company_id": c.company_id,
         "phones": [format_phone(p.value) for p in points if p.kind == "phone"],
         "emails": [p.value for p in points if p.kind == "email"],

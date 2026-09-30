@@ -144,6 +144,8 @@ def company_for_source(session: Session, source: Source) -> Company:
                     source_id=source.id, website=(source.config or {}).get("base_url"))
         session.add(c)
         session.flush()
+    elif c.name != source.name:
+        c.name, c.norm_name = source.name, normalize_name(source.name) or source.id
     return c
 
 

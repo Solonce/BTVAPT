@@ -27,7 +27,7 @@ interval_minutes = 180
 expected_min = 1
 
 [sources.stonebrown]
-name = "Stone Brown"
+name = "Stone & Browning Property Management"
 platform = "appfolio"
 robots_override = true
 base_url = "https://stonebrown.appfolio.com"
@@ -35,7 +35,7 @@ interval_minutes = 180
 expected_min = 1
 
 [sources.fpmvt]
-name = "fpmvt (AppFolio)"
+name = "Fusion Property Management"
 platform = "appfolio"
 robots_override = true
 base_url = "https://fpmvt.appfolio.com"

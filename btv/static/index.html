@@ -3,94 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BTVAPT status</title>
-<style>
-  :root { --bg:#fafaf9; --fg:#1c1917; --muted:#78716c; --line:#e7e5e4; --card:#fff;
-          --ok:#15803d; --warn:#b45309; --bad:#b91c1c; --bar:#2563eb; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#1c1917; --fg:#f5f5f4; --muted:#a8a29e; --line:#44403c; --card:#292524;
-            --ok:#4ade80; --warn:#fbbf24; --bad:#f87171; --bar:#60a5fa; }
-  }
-  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.45 system-ui, sans-serif; }
-  main { max-width:1000px; margin:0 auto; padding:16px; }
-  h1 { font-size:20px; margin:0 0 4px; } h2 { font-size:15px; margin:24px 0 8px; }
-  .muted { color:var(--muted); }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:8px; }
-  table { width:100%; border-collapse:collapse; } td, th { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
-  .scroll { overflow-x:auto; }
-  .bar { height:8px; background:var(--line); border-radius:4px; overflow:hidden; margin:6px 0; }
-  .bar > span { display:block; height:100%; background:var(--bar); transition:width .5s; }
-  .bar.indet > span { width:30%; animation:slide 1.2s infinite linear; }
-  @keyframes slide { from { margin-left:-30%; } to { margin-left:100%; } }
-  .pill { display:inline-block; padding:1px 8px; border-radius:10px; font-size:12px; border:1px solid currentColor; }
-  .ok { color:var(--ok); } .degraded, .stale, .never_run, .warn { color:var(--warn); } .failing, .bad, .failed, .interrupted { color:var(--bad); } .disabled { color:var(--muted); }
-  input, button { font:inherit; padding:4px 8px; }
-</style>
+<title>BTV Apartments</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%232f5d50'/><path d='M8 24V13l8-6 8 6v11h-6v-6h-4v6z' fill='white'/></svg>">
+<!-- Leaflet 1.9.4 is vendored so the app works without third-party CDNs; only map tiles are fetched live. -->
+<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.min.css">
+<link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
-<main>
-  <h1>BTVAPT status</h1>
-  <div class="muted" id="summary">loading…</div>
-
-  <h2>Active jobs</h2>
-  <div id="active"><div class="muted">none</div></div>
-
-  <h2>Sources</h2>
-  <div class="card scroll"><table id="sources"></table></div>
-
-  <h2>Settings</h2>
-  <div class="card">
-    Target move-in <input type="date" id="target"> ± <input type="number" id="window" min="0" style="width:5em"> days
-    <button id="save">Save</button> <span id="saved" class="muted"></span>
+<header class="topbar">
+  <div class="brand"><span class="dot"></span><span class="txt">BTV Apartments</span></div>
+  <nav class="tabs">
+    <a href="#/map" data-tab="map">Map</a>
+    <a href="#/contacts" data-tab="contacts">Contacts</a>
+    <a href="#/health" data-tab="health"><span class="health-dot" id="healthDot"></span>&nbsp;Health</a>
+  </nav>
+  <div class="target">
+    <label for="targetDate">Move-in</label>
+    <input type="date" id="targetDate" title="Target move-in date">
+    <span>±</span>
+    <input type="number" id="windowDays" min="0" max="365" title="Near-miss window (days)">
+    <span>d</span>
   </div>
+</header>
 
-  <h2>Recent jobs</h2>
-  <div class="card scroll"><table id="jobs"></table></div>
-  <p class="muted">JSON: <a href="/api/health">/api/health</a> · <a href="/api/jobs">/api/jobs</a> · <a href="/docs">/docs</a></p>
-</main>
-<script>
-const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const ago = (iso) => { if (!iso) return "never"; const s = (Date.now() - Date.parse(iso)) / 1000;
-  return s < 90 ? `${Math.round(s)}s ago` : s < 5400 ? `${Math.round(s/60)}m ago` : s < 172800 ? `${Math.round(s/3600)}h ago` : `${Math.round(s/86400)}d ago`; };
-const dur = (s) => s == null ? "" : s < 90 ? `${Math.round(s)}s` : `${Math.round(s/60)}m`;
-
-function jobCard(j) {
-  const pct = j.percent;
-  return `<div class="card"><b>#${j.id} ${esc(j.kind)}</b> ${esc(j.source_id || "")}
-    <span class="pill ${esc(j.status)}">${esc(j.status)}</span>
-    <div class="bar ${pct == null ? "indet" : ""}"><span style="width:${pct ?? 0}%"></span></div>
-    <span>${pct == null ? "working" : pct + "%"}${j.total ? ` (${j.done}/${j.total})` : ""}</span>
-    · <span class="muted">${esc(j.step || "")}</span>
-    <span class="muted">${j.elapsed_seconds != null ? " · " + dur(j.elapsed_seconds) + " elapsed" : ""}${j.eta_seconds != null ? " · ~" + dur(j.eta_seconds) + " left" : ""}</span></div>`;
-}
-
-async function refresh() {
-  try {
-    const [health, jobs] = await Promise.all([fetch("/api/health").then(r => r.json()), fetch("/api/jobs?limit=20").then(r => r.json())]);
-    $("summary").innerHTML = `<span class="pill ${health.ok ? "ok" : "bad"}">${health.ok ? "healthy" : "attention needed"}</span>
-      · last backup ${health.last_backup ? ago(health.last_backup.finished_at) + " (" + esc(health.last_backup.status) + ")" : "never"}`;
-    $("active").innerHTML = jobs.active.length ? jobs.active.map(jobCard).join("") : `<div class="muted">none</div>`;
-    $("sources").innerHTML = `<tr><th>Source</th><th>State</th><th>Last run</th><th>Last success</th><th>Count</th><th>Notes</th></tr>` +
-      health.sources.map(s => `<tr><td>${esc(s.name)}<br><span class="muted">${esc(s.source_id)} · ${esc(s.platform)}</span></td>
-        <td><span class="pill ${esc(s.state)}">${esc(s.state)}</span></td><td>${ago(s.last_run_at)}</td><td>${ago(s.last_success_at)}</td>
-        <td>${s.last_count ?? ""}</td><td class="muted">${esc(s.reasons.join("; "))}</td></tr>`).join("");
-    $("jobs").innerHTML = `<tr><th>#</th><th>Kind</th><th>Status</th><th>Progress</th><th>Finished</th><th>Error</th></tr>` +
-      jobs.jobs.map(j => `<tr><td>${j.id}</td><td>${esc(j.kind)} ${esc(j.source_id || "")}</td><td><span class="pill ${esc(j.status)}">${esc(j.status)}</span></td>
-        <td>${j.percent != null ? j.percent + "%" : ""}</td><td>${ago(j.finished_at)}</td><td class="muted">${esc(j.error || "")}</td></tr>`).join("");
-  } catch (e) { $("summary").textContent = "API unreachable: " + e; }
-}
-
-async function loadSettings() {
-  const s = await fetch("/api/settings").then(r => r.json());
-  $("target").value = s.target_move_in; $("window").value = s.near_miss_days;
-}
-$("save").onclick = async () => {
-  const r = await fetch("/api/settings", {method: "PUT", headers: {"content-type": "application/json"},
-    body: JSON.stringify({target_move_in: $("target").value, near_miss_days: Number($("window").value)})});
-  $("saved").textContent = r.ok ? "saved" : "error: " + (await r.text());
-};
-loadSettings(); refresh(); setInterval(refresh, 3000);
-</script>
+<main id="view"></main>
+<aside class="drawer" id="drawer" aria-live="polite"></aside>
+<script src="/static/vendor/leaflet/leaflet.min.js"></script>
+<script src="/static/app.js"></script>
 </body>
 </html>

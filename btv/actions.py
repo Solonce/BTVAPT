@@ -211,6 +211,8 @@ def undo(s: Session, merge_id: int) -> MergeLog:
             for k, v in sub["prev_into_prefs"].items():
                 setattr(p, k, v)
     elif log.action in ("unlink_listing", "link_listing"):
+        if sub.get("from_unit_id") is None:
+            raise ActionError("this was the listing's first link; merge or split instead")
         sl = s.get(SourceListing, sub["source_listing_id"])
         sl.unit_id = sub["from_unit_id"]
         sl.link_locked = True if log.action == "link_listing" else bool(sub.get("was_locked"))
