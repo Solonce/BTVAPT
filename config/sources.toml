@@ -55,9 +55,10 @@ disabled_reason = "subdomain unknown"
 
 [sources.rpmsterling]
 name = "RPM Sterling"
-platform = "unknown"
-base_url = "https://www.rpmsterling.com/houses-rent"
+platform = "appfolio"
+# rpmsterling.com/houses-rent embeds the AppFolio listing widget for this host.
+base_url = "https://rpmvt001.appfolio.com"
 interval_minutes = 180
 expected_min = 0
 enabled = false
-disabled_reason = "platform under investigation"
+disabled_reason = "adapter not built yet"
