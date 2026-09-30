@@ -79,6 +79,7 @@ def source_health(source: Source, cfg: Config | None = None, now: datetime | Non
         "expected_max": source.expected_max,
         "consecutive_failures": source.consecutive_failures,
         "interval_minutes": source.interval_minutes,
+        "robots_override": bool((source.config or {}).get("robots_override", False)),
         "next_due_at": _iso(next_due(source)),
     }
 

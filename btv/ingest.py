@@ -118,11 +118,13 @@ def scrape(ctx: JobContext, source_id: str, **_ignored) -> dict:
     cfg = ctx.cfg
     Session_ = session_factory(cfg)
     session = Session_()
-    client = PoliteClient(cfg)
+    client = None
     try:
         source = session.get(Source, source_id)
         if source is None:
             raise KeyError(f"unknown source {source_id!r}")
+        # robots_override is an explicit per-source opt-out (see sources.toml).
+        client = PoliteClient(cfg, respect_robots=not (source.config or {}).get("robots_override", False))
         if not source.enabled:
             ctx.log(f"{source_id} is disabled; skipping")
             return {"skipped": "disabled"}
@@ -170,7 +172,8 @@ def scrape(ctx: JobContext, source_id: str, **_ignored) -> dict:
         return {"scrape_run_id": run.id, "listings": len(seen), "new_snapshots": created,
                 "healthy": healthy, "problems": problems, **misses}
     finally:
-        client.close()
+        if client is not None:
+            client.close()
         session.close()
 
 

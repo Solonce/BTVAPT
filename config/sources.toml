@@ -5,6 +5,10 @@
 # Standard columns: name, platform, interval_minutes, expected_min,
 # expected_max, enabled (initial kill-switch state), disabled_reason.
 #
+# robots_override = true skips robots.txt for that source. AppFolio's
+# robots.txt disallows everything; by explicit decision (2026-09-30) we fetch
+# only the public listing pages at a low rate for AppFolio sources.
+#
 # Adapters for buildium/appfolio land in build step 2-3; until then these
 # sources are disabled so the scheduler doesn't try to run them.
 
@@ -29,6 +33,7 @@ disabled_reason = "adapter not built yet"
 [sources.stonebrown]
 name = "Stone Brown"
 platform = "appfolio"
+robots_override = true
 base_url = "https://stonebrown.appfolio.com"
 interval_minutes = 180
 expected_min = 0
@@ -38,6 +43,7 @@ disabled_reason = "adapter not built yet"
 [sources.fpmvt]
 name = "fpmvt (AppFolio)"
 platform = "appfolio"
+robots_override = true
 base_url = "https://fpmvt.appfolio.com"
 interval_minutes = 180
 expected_min = 0
@@ -47,6 +53,7 @@ disabled_reason = "adapter not built yet"
 [sources.distinctive]
 name = "Distinctive PM / Farrell Gardens"
 platform = "appfolio"
+robots_override = true
 base_url = ""  # TODO: find AppFolio subdomain
 interval_minutes = 180
 expected_min = 0
@@ -56,6 +63,7 @@ disabled_reason = "subdomain unknown"
 [sources.rpmsterling]
 name = "RPM Sterling"
 platform = "appfolio"
+robots_override = true
 # rpmsterling.com/houses-rent embeds the AppFolio listing widget for this host.
 base_url = "https://rpmvt001.appfolio.com"
 interval_minutes = 180

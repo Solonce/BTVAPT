@@ -21,7 +21,11 @@ class Config:
     sources_file: Path = Path("config/sources.toml")
     host: str = "127.0.0.1"
     port: int = 8321
-    user_agent: str = "BTVAPT/0.1 (personal apartment search; low-rate)"
+    # Browser UA: Buildium redirects non-browser agents to a login page.
+    user_agent: str = (
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/129.0.0.0 Safari/537.36"
+    )
     # Minimum seconds between requests to the same host.
     per_host_interval: float = 5.0
     # Backup retention.
