@@ -1,0 +1,63 @@
+# Source definitions. `btv sources sync` loads this into the DB.
+# Keys under a source other than the standard columns are passed to the
+# platform adapter as its config.
+#
+# Standard columns: name, platform, interval_minutes, expected_min,
+# expected_max, enabled (initial kill-switch state), disabled_reason.
+#
+# Adapters for buildium/appfolio land in build step 2-3; until then these
+# sources are disabled so the scheduler doesn't try to run them.
+
+[sources.fiveseasons]
+name = "Five Seasons Property Management"
+platform = "buildium"
+base_url = "https://fiveseasonspropertymanagement.managebuilding.com"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "adapter not built yet"
+
+[sources.hinsdale]
+name = "Hinsdale Properties"
+platform = "buildium"
+base_url = "https://hinsdaleproperties.managebuilding.com"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "adapter not built yet"
+
+[sources.stonebrown]
+name = "Stone Brown"
+platform = "appfolio"
+base_url = "https://stonebrown.appfolio.com"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "adapter not built yet"
+
+[sources.fpmvt]
+name = "fpmvt (AppFolio)"
+platform = "appfolio"
+base_url = "https://fpmvt.appfolio.com"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "adapter not built yet"
+
+[sources.distinctive]
+name = "Distinctive PM / Farrell Gardens"
+platform = "appfolio"
+base_url = ""  # TODO: find AppFolio subdomain
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "subdomain unknown"
+
+[sources.rpmsterling]
+name = "RPM Sterling"
+platform = "unknown"
+base_url = "https://www.rpmsterling.com/houses-rent"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "platform under investigation"

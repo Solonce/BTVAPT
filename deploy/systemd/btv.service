@@ -1,0 +1,23 @@
+# Install: sudo cp deploy/systemd/btv.service /etc/systemd/system/ && sudo systemctl daemon-reload
+#          sudo systemctl enable --now btv
+# Adjust User and WorkingDirectory to where you cloned the repo.
+[Unit]
+Description=BTVAPT apartment tracker (API + scheduler/worker)
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=btv
+WorkingDirectory=/opt/btvapt
+ExecStartPre=/usr/bin/env uv run btv init
+ExecStart=/usr/bin/env uv run btv serve
+Restart=on-failure
+RestartSec=10
+# Keep headless browsers and parsers from starving the box.
+MemoryHigh=2G
+MemoryMax=3G
+Nice=5
+
+[Install]
+WantedBy=multi-user.target
