@@ -1,0 +1,10 @@
+# Copy to btv.toml (or point BTV_CONFIG at it). Every key is optional;
+# BTV_<KEY> environment variables override the file.
+data_dir = "data"
+sources_file = "config/sources.toml"
+host = "127.0.0.1"          # use your Tailscale IP (or 0.0.0.0 behind the tailnet firewall)
+port = 8321
+per_host_interval = 5.0     # seconds between requests to the same host
+keep_daily = 14
+keep_weekly = 8
+stale_after_intervals = 3.0

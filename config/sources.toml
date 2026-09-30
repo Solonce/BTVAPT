@@ -1,0 +1,70 @@
+# Source definitions. `btv sources sync` loads this into the DB.
+# Keys under a source other than the standard columns are passed to the
+# platform adapter as its config.
+#
+# Standard columns: name, platform, interval_minutes, expected_min,
+# expected_max, enabled (initial kill-switch state), disabled_reason.
+#
+# robots_override = true skips robots.txt for that source. AppFolio's
+# robots.txt disallows everything; by explicit decision (2026-09-30) we fetch
+# only the public listing pages at a low rate for AppFolio sources.
+#
+# AppFolio adapters land in build step 3; until then those sources are
+# disabled so the scheduler doesn't try to run them.
+
+[sources.fiveseasons]
+name = "Five Seasons Property Management"
+# Five Seasons disabled Buildium's public listings page; their own site
+# (Nesthub, fed from Buildium) exposes the same listings as JSON.
+platform = "nesthub"
+base_url = "https://www.burlingtonproperty.management"
+interval_minutes = 180
+expected_min = 1
+
+[sources.hinsdale]
+name = "Hinsdale Properties"
+platform = "buildium"
+base_url = "https://hinsdaleproperties.managebuilding.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.stonebrown]
+name = "Stone Brown"
+platform = "appfolio"
+robots_override = true
+base_url = "https://stonebrown.appfolio.com"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "adapter not built yet"
+
+[sources.fpmvt]
+name = "fpmvt (AppFolio)"
+platform = "appfolio"
+robots_override = true
+base_url = "https://fpmvt.appfolio.com"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "adapter not built yet"
+
+[sources.distinctive]
+name = "Distinctive PM / Farrell Gardens"
+platform = "appfolio"
+robots_override = true
+base_url = ""  # TODO: find AppFolio subdomain
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "subdomain unknown"
+
+[sources.rpmsterling]
+name = "RPM Sterling"
+platform = "appfolio"
+robots_override = true
+# rpmsterling.com/houses-rent embeds the AppFolio listing widget for this host.
+base_url = "https://rpmvt001.appfolio.com"
+interval_minutes = 180
+expected_min = 0
+enabled = false
+disabled_reason = "adapter not built yet"

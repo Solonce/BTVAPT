@@ -1,0 +1,35 @@
+[project]
+name = "btv"
+version = "0.1.0"
+description = "Burlington VT apartment intelligence tracker"
+requires-python = ">=3.11"
+dependencies = [
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "httpx>=0.27",
+    "typer>=0.12",
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+browser = ["playwright>=1.44"]
+
+[project.scripts]
+btv = "btv.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["btv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
