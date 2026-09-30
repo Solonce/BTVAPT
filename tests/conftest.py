@@ -37,3 +37,34 @@ def listing(ext_id, **kw):
     d = {"external_id": ext_id, "url": f"https://example.com/{ext_id}", "rent": 1500}
     d.update(kw)
     return d
+
+
+FIXTURES = __import__("pathlib").Path(__file__).parent / "fixtures"
+
+
+@pytest.fixture
+def mock_http(monkeypatch):
+    """Route all PoliteClient traffic through a handler; returns the request log."""
+    import functools
+
+    import httpx
+
+    import btv.ingest
+    from btv.http import PoliteClient
+
+    state = {"handler": None, "log": []}
+
+    def transport_handler(req):
+        state["log"].append(str(req.url))
+        if req.url.path == "/robots.txt":
+            return httpx.Response(404)
+        return state["handler"](req)
+
+    monkeypatch.setattr(btv.ingest, "PoliteClient", functools.partial(
+        PoliteClient, transport=httpx.MockTransport(transport_handler), sleep=lambda s: None))
+    return state
+
+
+def add_source(cfg, sid, platform, **config):
+    with session_scope(cfg) as s:
+        s.add(Source(id=sid, name=sid, platform=platform, config=config, interval_minutes=180, expected_min=1))

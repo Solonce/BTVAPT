@@ -9,26 +9,24 @@
 # robots.txt disallows everything; by explicit decision (2026-09-30) we fetch
 # only the public listing pages at a low rate for AppFolio sources.
 #
-# Adapters for buildium/appfolio land in build step 2-3; until then these
-# sources are disabled so the scheduler doesn't try to run them.
+# AppFolio adapters land in build step 3; until then those sources are
+# disabled so the scheduler doesn't try to run them.
 
 [sources.fiveseasons]
 name = "Five Seasons Property Management"
-platform = "buildium"
-base_url = "https://fiveseasonspropertymanagement.managebuilding.com"
+# Five Seasons disabled Buildium's public listings page; their own site
+# (Nesthub, fed from Buildium) exposes the same listings as JSON.
+platform = "nesthub"
+base_url = "https://www.burlingtonproperty.management"
 interval_minutes = 180
-expected_min = 0
-enabled = false
-disabled_reason = "adapter not built yet"
+expected_min = 1
 
 [sources.hinsdale]
 name = "Hinsdale Properties"
 platform = "buildium"
 base_url = "https://hinsdaleproperties.managebuilding.com"
 interval_minutes = 180
-expected_min = 0
-enabled = false
-disabled_reason = "adapter not built yet"
+expected_min = 1
 
 [sources.stonebrown]
 name = "Stone Brown"

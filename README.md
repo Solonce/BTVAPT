@@ -21,6 +21,9 @@ a fallback (one browser context at a time).
 | `btv/health.py` | Run health checks (expected counts, sudden drops) and per-source dashboard state |
 | `btv/http.py` | Polite client: robots.txt, per-host rate limit, retries with backoff |
 | `btv/sources/` | Adapter interface + registry; `file` adapter for tests/manual paste-in |
+| `btv/sources/buildium.py` | Buildium public pages (DotVVM viewmodel JSON embedded in the page); used by Hinsdale |
+| `btv/sources/nesthub.py` | Nesthub PM websites' JSON API; used by Five Seasons (their Buildium public page is disabled) |
+| `tests/fixtures/` | Saved real responses per platform; parser tests run against them |
 | `btv/backup.py` | Online SQLite backup, gzip, 14 daily + 8 weekly retention |
 | `config/sources.toml` | Source definitions (synced into the DB) |
 
@@ -39,6 +42,18 @@ a fallback (one browser context at a time).
   median) are unhealthy and never count as misses.
 - **Kill switch:** `btv sources disable <id> --reason ...` (or the API).
   Failing sources back off exponentially (capped at one day).
+
+## Sources
+
+| Source | Platform | Notes |
+|---|---|---|
+| Hinsdale | `buildium` | `ApartmentSearch.aspx` holds every listing; detail/images pages add amenities and photos |
+| Five Seasons | `nesthub` | burlingtonproperty.management `/_system/api/listings` JSON (lat/lon, features, utilities) |
+| Stone Brown, fpmvt, RPM Sterling, Distinctive | `appfolio` | adapter pending; `robots_override = true` by explicit decision |
+
+Detail pages are only refetched when a listing is new, its summary changed,
+or `detail_refresh_hours` (default 24) elapsed, so routine runs are one or
+two requests per source.
 
 ## Running it
 
