@@ -288,12 +288,19 @@ def create_app(cfg: Config | None = None, start_worker: bool = True) -> FastAPI:
         """Save a post from anywhere (bookmarklet, paste). Runs the full pipeline."""
         from btv.inbox import ingest_text
 
+        from btv.pipeline import resolve_unit
+
         with session_scope(cfg) as s:
             try:
                 sl = ingest_text(s, text, url=url, title=title, author=author)
             except ValueError as exc:
                 raise HTTPException(400, str(exc)) from exc
-            return {"source_listing_id": sl.id, "unit_id": sl.unit_id}
+            unit = resolve_unit(s, sl.unit_id)
+            needs_geocode = unit is not None and unit.building.lat is None
+            result = {"source_listing_id": sl.id, "unit_id": sl.unit_id}
+        if needs_geocode:  # after commit: enqueue opens its own write transaction
+            runner.enqueue("geocode", cfg=cfg)
+        return result
 
     @app.put("/api/leads/{source_listing_id}")
     def update_lead(source_listing_id: int, triage: str | None = Body(None), address: str | None = Body(None)):

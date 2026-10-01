@@ -137,7 +137,7 @@ class ScamIndex:
                     r.add(4, "Uses a photo from a property manager's listing",
                           f"same photo as {o['sources'][0]['source']} at {o['address']}", "copy")
                     break
-            if not unit.get("address") or unit.get("lat") is None:
+            if not unit.get("address"):
                 r.add(1, "No street address given", None, "address")
         return r.as_dict()
 
