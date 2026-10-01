@@ -11,12 +11,14 @@ import re
 from btv.normalize.address import SUFFIXES
 
 _SUFFIX_RE = "|".join(sorted({k for k in SUFFIXES} | {"st", "ave", "rd"}, key=len, reverse=True))
+# Street words must be Capitalized (case-sensitive) so "2 bedroom on Loomis St"
+# isn't read as an address; suffix/unit/town parts are case-insensitive.
 _ADDRESS = re.compile(
     rf"\b(\d{{1,5}}(?:-\d{{1,5}})?(?:\s+1/2)?\s+(?:[NSEW]\.?\s+|North\s+|South\s+|East\s+|West\s+)?"
-    rf"(?:[A-Z][\w'.-]*\s+){{1,3}}(?:{_SUFFIX_RE})\b\.?(?:\s*(?:#|apt\.?|unit)\s*[\w-]+)?"
-    rf"(?:,?\s+(?:Burlington|South Burlington|Winooski|Essex(?: Junction)?|Colchester|Williston|Shelburne))?)",
-    re.I,
+    rf"(?:[A-Z][\w'.-]*\s+){{1,3}}(?i:{_SUFFIX_RE})\b\.?(?:\s*(?i:#|apt\.?|unit)\s*[\w-]+)?"
+    rf"(?:,?\s+(?i:Burlington|South Burlington|Winooski|Essex(?: Junction)?|Colchester|Williston|Shelburne))?)"
 )
+_NOT_ADDRESS = re.compile(r"(?i)\b(bed(room)?s?|br|bath(room)?s?|ba|month|mo|minutes?|mins?|blocks?|miles?)\b")
 _RENT = re.compile(r"\$\s?(\d{1,2}(?:,\d{3})|\d{3,4})(?:\.\d{2})?\s*(?:/\s*(?:mo|month)|per\s+month|a\s+month|monthly)?", re.I)
 _RENT_WORD = re.compile(r"(?i)\b(?:rent|asking|price)\s*(?:is|:)?\s*\$?\s?(\d{1,2},\d{3}|\d{3,4})\b")
 _BEDS = re.compile(r"(?i)\b(\d(?:\.5)?|one|two|three|four|five)\s*(?:-|\s)?(?:br\b|bd\b|bed(?:room)?s?\b)")
@@ -43,8 +45,12 @@ def parse_freeform(text: str) -> dict:
         beds = float(_WORDS.get(g, g))
     m = _BATHS.search(t)
     baths = float(m.group(1)) if m else None
-    m = _ADDRESS.search(t)
-    address = re.sub(r"\s+", " ", m.group(1)).strip(" ,.") if m else None
+    address = None
+    for m in _ADDRESS.finditer(t):
+        cand = re.sub(r"\s+", " ", m.group(1)).strip(" ,.")
+        if not _NOT_ADDRESS.search(cand):
+            address = cand
+            break
     pets = None
     if re.search(r"(?i)\bno\s+pets\b|pets?\s+not\s+allowed", t):
         pets = "no pets"

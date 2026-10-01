@@ -78,3 +78,22 @@ def test_recover_stale_marks_dead_process_interrupted(cfg):
     with session_scope(cfg) as s:
         statuses = sorted(j.status for j in s.query(Job))
     assert statuses == ["interrupted", "running"]
+
+
+def test_interrupted_scrape_makes_source_due_again(cfg):
+    from btv.health import next_due
+    from btv.models import ScrapeRun, Source
+
+    with session_scope(cfg) as s:
+        s.add(Source(id="x", name="X", platform="file", config={}, interval_minutes=180, last_run_at=utcnow()))
+        s.flush()
+        j = Job(kind="scrape", source_id="x", status="running", pid=2**22 + 999, started_at=utcnow(), heartbeat_at=utcnow())
+        s.add(j)
+        s.flush()
+        s.add(ScrapeRun(source_id="x", job_id=j.id, status="running"))
+    runner.recover_stale(cfg)
+    with session_scope(cfg) as s:
+        src = s.get(Source, "x")
+        assert src.last_run_at is None and src.last_status == "failed"
+        assert next_due(src) <= utcnow()
+        assert s.query(ScrapeRun).one().status == "failed"

@@ -189,7 +189,21 @@ def recover_stale(cfg: Config | None = None) -> list[int]:
                 j.finished_at = utcnow()
                 j.error = "process exited" if dead else "no heartbeat for 15 minutes"
                 recovered.append(j.id)
+                if j.kind == "scrape" and j.source_id:
+                    _reset_interrupted_scrape(s, j)
     return recovered
+
+
+def _reset_interrupted_scrape(s, j: Job) -> None:
+    """Make an interrupted source due again instead of waiting a full interval."""
+    from btv.models import ScrapeRun, Source
+
+    src = s.get(Source, j.source_id)
+    if src is not None:
+        src.last_run_at = src.last_success_at
+        src.last_status, src.last_error = "failed", f"interrupted ({j.error})"
+    for run in s.query(ScrapeRun).filter_by(job_id=j.id, status="running").all():
+        run.status, run.error, run.finished_at, run.healthy = "failed", "interrupted", utcnow(), False
 
 
 @contextmanager

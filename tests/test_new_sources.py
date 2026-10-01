@@ -52,6 +52,9 @@ def test_freeform():
     assert (f["rent"], f["beds"], f["baths"], f["pets"]) == (975, 2.0, 1.0, "pets ok")
     assert f["address"] == "54 North Union St, Burlington"
     assert parse_freeform("3 bedroom house. Rent is 2,850. No pets.")["rent"] == 2850
+    f = parse_freeform("Moving out of our 2 bedroom on Loomis St (32 Loomis St, Burlington), $1,950/month")
+    assert f["address"] == "32 Loomis St, Burlington"
+    assert parse_freeform("Cozy 2 Bedroom Apt near campus, 5 Minutes walk")["address"] is None
 
 
 def test_scam_text_flags():
