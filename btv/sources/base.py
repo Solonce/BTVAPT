@@ -146,7 +146,9 @@ def register(cls: type[Adapter]) -> type[Adapter]:
 def get_adapter_class(platform: str) -> type[Adapter]:
     import btv.sources.appfolio  # noqa: F401  (registers built-ins)
     import btv.sources.buildium  # noqa: F401
+    import btv.sources.craigslist  # noqa: F401
     import btv.sources.file  # noqa: F401
+    import btv.sources.manual  # noqa: F401
     import btv.sources.nesthub  # noqa: F401
 
     if platform not in PLATFORMS:
@@ -176,7 +178,7 @@ def html_to_text(value: str | None) -> str | None:
 
     if value is None:
         return None
-    text = re.sub(r"(?i)<br\s*/?>|</p>|</li>", "\n", value)
+    text = re.sub(r"(?i)<br\s*/?>\r?\n?|</p>|</li>", "\n", value)
     text = re.sub(r"(?i)<li[^>]*>", "- ", text)
     text = re.sub(r"<[^>]+>", "", text)
     text = _html.unescape(text).replace("\r\n", "\n")

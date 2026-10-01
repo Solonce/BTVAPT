@@ -58,3 +58,131 @@ robots_override = true
 base_url = "https://rpmvt001.appfolio.com"
 interval_minutes = 180
 expected_min = 1
+
+# ---- Discovered via ShowMeTheRent (AppFolio's aggregator), 2026-10-01 ----
+
+[sources.bissonette]
+name = "Bissonette Properties"
+platform = "appfolio"
+robots_override = true
+base_url = "https://bissonetteproperties.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.strongwill]
+name = "Strong Will Property Management"
+platform = "appfolio"
+robots_override = true
+base_url = "https://strongwillpropmgmt.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.fullcircle]
+name = "Full Circle Property Management"
+platform = "appfolio"
+robots_override = true
+base_url = "https://fullcirclevt.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.farrell]
+name = "Farrell Real Estate"
+platform = "appfolio"
+robots_override = true
+base_url = "https://farrellre.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.ireland]
+name = "S.D. Ireland Properties"
+platform = "appfolio"
+robots_override = true
+base_url = "https://sdireland.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.larkin]
+name = "Larkin Realty"
+platform = "appfolio"
+robots_override = true
+base_url = "https://larkinrealty.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.nedde]
+name = "Nedde Real Estate"
+platform = "appfolio"
+robots_override = true
+base_url = "https://nedderealestate.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.appletree]
+name = "Appletree Bay Management"
+platform = "appfolio"
+robots_override = true
+base_url = "https://appletreebaymanagement.appfolio.com"
+interval_minutes = 180
+expected_min = 1
+
+[sources.gardner]
+name = "Gardner Properties"
+platform = "appfolio"
+robots_override = true
+base_url = "https://gardnerprops.appfolio.com"
+interval_minutes = 360
+expected_min = 0
+
+[sources.queencity]
+name = "Queen City Development Group"
+platform = "appfolio"
+robots_override = true
+base_url = "https://queencitydgllc.appfolio.com"
+interval_minutes = 360
+expected_min = 0
+
+[sources.colchesterpm]
+name = "Colchester Property Management"
+platform = "appfolio"
+robots_override = true
+base_url = "https://ccsincvt.appfolio.com"
+interval_minutes = 360
+expected_min = 0
+
+# ---- Private landlords ----
+
+[sources.craigslist]
+name = "Craigslist"
+platform = "craigslist"
+area = "burlington"
+postal = "05401"
+search_distance = 12  # miles
+default_city = "Burlington"
+interval_minutes = 120
+expected_min = 20
+
+# Listings you send from Facebook/anywhere via the bookmarklet or Add page.
+[sources.manual]
+name = "Saved by me"
+platform = "manual"
+interval_minutes = 1440
+expected_min = 0
+
+# Emails (Facebook notifications, Front Porch Forum digests, alerts) read
+# from the inbox configured in btv.toml [inbox]; see README.
+[sources.email]
+name = "Email inbox"
+platform = "email"
+interval_minutes = 1440
+expected_min = 0
+
+# Redstone's listings (Yardi RentCafe) sit behind a Cloudflare browser
+# challenge; needs the Playwright adapter (not built yet).
+[sources.redstone]
+name = "Redstone"
+platform = "rentcafe"
+base_url = "https://listings.redstonevt.com/searchlisting.aspx"
+interval_minutes = 360
+expected_min = 0
+enabled = false
+disabled_reason = "Cloudflare challenge; browser adapter not built yet"

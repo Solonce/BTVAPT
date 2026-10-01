@@ -56,6 +56,8 @@ def _load_builtin_jobs() -> None:
     import btv.backup  # noqa: F401
     import btv.geocode  # noqa: F401
     import btv.ingest  # noqa: F401
+    import btv.inbox  # noqa: F401
+    import btv.owners  # noqa: F401
     import btv.pipeline  # noqa: F401
 
 

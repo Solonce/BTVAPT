@@ -33,21 +33,18 @@ def backup_db(cfg: Config, ctx: JobContext | None = None) -> Path:
     src = sqlite3.connect(cfg.db_path)
     dst = sqlite3.connect(raw)
     if ctx:
+        ctx.set_total(100)
         ctx.step("copying database")
-
-    def progress(_status, remaining, total):
-        if ctx and total:
-            ctx.total = total * 2  # copy + compress phases
-            ctx.done = total - remaining
-            ctx.heartbeat()
-
+    # Copy in a single step: a stepped backup restarts whenever another
+    # connection writes (our own progress heartbeats included) and can loop.
     try:
-        src.backup(dst, pages=256, progress=progress)
+        src.backup(dst, pages=-1)
     finally:
         dst.close()
         src.close()
 
     if ctx:
+        ctx.done = 50
         ctx.step("compressing")
     size = raw.stat().st_size
     chunk = 1 << 20
@@ -56,8 +53,8 @@ def backup_db(cfg: Config, ctx: JobContext | None = None) -> Path:
         while block := fin.read(chunk):
             fout.write(block)
             read += len(block)
-            if ctx and ctx.total and size:
-                ctx.done = ctx.total // 2 + int((ctx.total // 2) * read / size)
+            if ctx and size:
+                ctx.done = 50 + int(50 * read / size)
                 ctx.heartbeat()
     os.replace(final.with_suffix(".tmp"), final)
     raw.unlink()

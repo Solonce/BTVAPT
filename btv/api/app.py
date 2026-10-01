@@ -270,6 +270,58 @@ def create_app(cfg: Config | None = None, start_worker: bool = True) -> FastAPI:
             m = _act(lambda: actions.review_mention(s, mention_id, decision))
             return {"id": m.id, "review_state": m.review_state}
 
+    @app.get("/api/owners")
+    def owners():
+        with session_scope(cfg) as s:
+            return views.list_owners(s)
+
+    # ------------------------------------------------------------ leads
+    @app.get("/api/leads")
+    def leads(triage: str | None = None):
+        with session_scope(cfg) as s:
+            rows = views.list_leads(s)
+        return [r for r in rows if r["triage"] in triage.split(",")] if triage else rows
+
+    @app.post("/api/leads")
+    def add_lead(text: str = Body(""), url: str | None = Body(None), title: str | None = Body(None),
+                 author: str | None = Body(None)):
+        """Save a post from anywhere (bookmarklet, paste). Runs the full pipeline."""
+        from btv.inbox import ingest_text
+
+        with session_scope(cfg) as s:
+            try:
+                sl = ingest_text(s, text, url=url, title=title, author=author)
+            except ValueError as exc:
+                raise HTTPException(400, str(exc)) from exc
+            return {"source_listing_id": sl.id, "unit_id": sl.unit_id}
+
+    @app.put("/api/leads/{source_listing_id}")
+    def update_lead(source_listing_id: int, triage: str | None = Body(None), address: str | None = Body(None)):
+        from btv.models import ListingSnapshot, SourceListing
+        from btv.pipeline import link_listing
+
+        needs_geocode = False
+        with session_scope(cfg) as s:
+            sl = s.get(SourceListing, source_listing_id)
+            if sl is None:
+                raise HTTPException(404, "no such lead")
+            if triage is not None:
+                if triage not in ("new", "saved", "contacted", "dismissed"):
+                    raise HTTPException(400, "triage must be new/saved/contacted/dismissed")
+                sl.triage = triage
+            if address is not None:
+                sl.address_override, sl.link_locked = address.strip() or None, False
+                snap = s.get(ListingSnapshot, sl.latest_snapshot_id)
+                unit = link_listing(s, sl, snap)
+                s.flush()
+                if address.strip() and unit is None:
+                    raise HTTPException(400, "couldn't understand that address")
+                needs_geocode = unit is not None and unit.building.lat is None
+            result = {"source_listing_id": sl.id, "triage": sl.triage, "unit_id": sl.unit_id}
+        if needs_geocode:  # after commit: enqueue opens its own write transaction
+            runner.enqueue("geocode", cfg=cfg)
+        return result
+
     @app.get("/api/companies")
     def companies():
         with session_scope(cfg) as s:

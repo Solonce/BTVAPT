@@ -58,7 +58,9 @@ def source_health(source: Source, cfg: Config | None = None, now: datetime | Non
         reasons.append(source.last_error or "last run failed health checks")
     if state in ("ok", "failing", "degraded") and source.last_run_at is not None:
         limit = timedelta(minutes=source.interval_minutes * cfg.stale_after_intervals)
-        if source.last_success_at is None or now - source.last_success_at > limit:
+        # Never succeeded yet: only stale once the first attempt is itself old.
+        reference = source.last_success_at or source.last_run_at
+        if now - reference > limit:
             if state == "ok":
                 state = "stale"
             reasons.append(

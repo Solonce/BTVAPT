@@ -210,6 +210,10 @@ class SourceListing(Base):
     consecutive_misses: Mapped[int] = mapped_column(Integer, default=0)
     # Set when the user links/unlinks by hand; auto-linking then leaves it alone.
     link_locked: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0")
+    # User-supplied address for leads whose source gave none (e.g. a Facebook post).
+    address_override: Mapped[str | None] = mapped_column(Text)
+    # Inbox triage for leads: new | saved | contacted | dismissed
+    triage: Mapped[str | None] = mapped_column(String(16))
     latest_snapshot_id: Mapped[int | None] = mapped_column(
         ForeignKey("listing_snapshots.id", use_alter=True, name="fk_sl_latest_snapshot")
     )
@@ -284,6 +288,7 @@ class Contact(Base):
     __tablename__ = "contacts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     display_name: Mapped[str | None] = mapped_column(String(200))
+    kind: Mapped[str | None] = mapped_column(String(16))  # person | office | unknown
     company_id: Mapped[int | None] = mapped_column(ForeignKey("companies.id"))
     role: Mapped[str | None] = mapped_column(String(64))
     notes: Mapped[str | None] = mapped_column(Text)
@@ -326,6 +331,22 @@ class ContactMention(Base):
     origin: Mapped[str] = mapped_column(String(16))  # contact_block | description
     confidence: Mapped[float | None] = mapped_column(Float)
     review_state: Mapped[str] = mapped_column(String(16), default="auto")  # auto | needs_review | confirmed | rejected
+
+
+class BuildingOwner(Base):
+    """Owner entity (LLC or person) behind a building, from public listing data."""
+
+    __tablename__ = "building_owners"
+    __table_args__ = (UniqueConstraint("building_id", "company_id", "source"),)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    building_id: Mapped[int] = mapped_column(ForeignKey("buildings.id"), index=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), index=True)
+    manager_company_id: Mapped[int | None] = mapped_column(ForeignKey("companies.id"))
+    source: Mapped[str] = mapped_column(String(32))  # showmetherent | manual | parcel
+    phone: Mapped[str | None] = mapped_column(String(32))
+    first_seen: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    last_seen: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    evidence: Mapped[dict | None] = mapped_column(JSON)
 
 
 class OutreachLog(Base):

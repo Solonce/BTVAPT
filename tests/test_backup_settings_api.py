@@ -21,6 +21,21 @@ def test_backup_job_creates_restorable_gzip(cfg):
     assert "source_listings" in tables
 
 
+def test_backup_of_multi_page_db_completes(cfg):
+    """Regression: a stepped backup restarted on every heartbeat write and never finished."""
+    from btv.db import session_scope
+    from btv.models import JobEvent, Job
+
+    with session_scope(cfg) as s:
+        j = Job(kind="filler", status="succeeded")
+        s.add(j)
+        s.flush()
+        s.add_all(JobEvent(job_id=j.id, message="x" * 2000) for _ in range(800))  # ~1.6 MB, many pages
+    job = runner.run_inline("backup", cfg=cfg)
+    assert job.status == "succeeded", job.error
+    assert job.percent == 100.0
+
+
 def test_prune_keeps_daily_and_weekly(cfg):
     cfg.backup_dir.mkdir(parents=True)
     start = datetime(2026, 1, 1, 3, 0, 0)

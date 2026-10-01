@@ -18,6 +18,7 @@ from btv import settings as user_settings
 from btv.db import utcnow
 from btv.models import (
     Building,
+    BuildingOwner,
     Company,
     Contact,
     ContactMention,
@@ -36,6 +37,7 @@ from btv.models import (
 from btv.normalize.amenities import detect_amenities
 from btv.normalize.contacts import format_phone
 from btv.normalize.dates import classify, effective_availability
+from btv.normalize.scam import ScamIndex, text_flags
 
 PLATFORM_RANK = {"buildium": 0, "nesthub": 0, "appfolio": 0, "custom": 1, "craigslist": 2,
                  "aggregator": 3, "email": 3, "file": 4, "manual": 4}
@@ -70,6 +72,14 @@ class Ctx:
         self.tags: dict[int, list[str]] = defaultdict(list)
         for t in s.query(UnitTag).order_by(UnitTag.tag).all():
             self.tags[t.unit_id].append(t.tag)
+        companies = {c.id: c for c in s.query(Company).all()}
+        self.owners: dict[int, list[dict]] = defaultdict(list)
+        for bo in s.query(BuildingOwner).all():
+            co, mgr = companies.get(bo.company_id), companies.get(bo.manager_company_id)
+            if co is not None:
+                self.owners[bo.building_id].append({"company_id": co.id, "name": co.name, "kind": co.kind,
+                                                    "manager": mgr.name if mgr else None,
+                                                    "phone": format_phone(bo.phone), "source": bo.source})
 
     def resolve(self, unit_id: int) -> int:
         seen = set()
@@ -170,10 +180,18 @@ def unit_summary(ctx: Ctx, unit_id: int) -> dict | None:
         "sources": [
             {"source_listing_id": sl.id, "source_id": sl.source_id,
              "source": ctx.sources[sl.source_id].name if sl.source_id in ctx.sources else sl.source_id,
+             "platform": ctx.sources[sl.source_id].platform if sl.source_id in ctx.sources else None,
              "url": sl.url, "status": sl.status, "last_seen": _iso(sl.last_seen),
              "last_verified": _iso(sl.last_verified)}
             for sl in listings
         ],
+        "owners": ctx.owners.get(unit.building_id, []),
+        "private_landlord": any((snap.extra or {}).get("private_landlord") for _, snap in active)
+                            and not any(ctx.sources.get(sl.source_id) and ctx.sources[sl.source_id].platform in
+                                        ("buildium", "nesthub", "appfolio") for sl, _ in active),
+        "posted_at": next(((snap.extra or {}).get("posted_at") for _, snap in active if (snap.extra or {}).get("posted_at")), None),
+        "_description": active[0][1].description,
+        "_photos": photos,
         "prefs": {"rating": prefs.rating if prefs else None, "status": prefs.status if prefs else None,
                   "notes": prefs.notes if prefs else None},
         "tags": ctx.tags.get(unit_id, []),
@@ -182,26 +200,44 @@ def unit_summary(ctx: Ctx, unit_id: int) -> dict | None:
 
 def list_units(s: Session, include_gone: bool = False) -> dict:
     ctx = Ctx(s)
-    out = []
+    allu = []
     for uid in ctx.listings_by_unit:
         if ctx.units.get(uid) and ctx.units[uid].merged_into_id:
             continue
         summ = unit_summary(ctx, uid)
-        if summ and (include_gone or summ["status"] != "gone"):
-            out.append(summ)
+        if summ:
+            allu.append(summ)
+    _add_risk(allu)
+    out = [u for u in allu if include_gone or u["status"] != "gone"]
     out.sort(key=lambda u: (_match_order(u["availability"]["match"]), abs(u["availability"]["delta_days"] or 9999)))
     return {"target_move_in": ctx.target.isoformat(), "near_miss_days": ctx.window,
             "count": len(out), "units": out}
+
+
+def _add_risk(units: list[dict]) -> None:
+    idx = ScamIndex(units, {u["id"]: u["_description"] for u in units}, {u["id"]: u["_photos"] for u in units})
+    for u in units:
+        u["risk"] = idx.assess(u, u.pop("_description"), u.pop("_photos"))
 
 
 def _match_order(m: str) -> int:
     return {"exact": 0, "near": 1, "late": 2, "early": 3, "unknown": 4}.get(m, 5)
 
 
+def _public(u: dict | None) -> dict | None:
+    if u is not None:
+        u.pop("_description", None)
+        u.pop("_photos", None)
+    return u
+
+
 def unit_detail(s: Session, unit_id: int) -> dict | None:
     ctx = Ctx(s)
     unit_id = ctx.resolve(unit_id)
-    summ = unit_summary(ctx, unit_id)
+    allu = [x for x in (unit_summary(ctx, uid) for uid in ctx.listings_by_unit
+                        if not (ctx.units.get(uid) and ctx.units[uid].merged_into_id)) if x]
+    _add_risk(allu)
+    summ = next((x for x in allu if x["id"] == unit_id), None)
     if summ is None:
         return None
     listings = ctx.listings_by_unit[unit_id]
@@ -292,7 +328,8 @@ def contact_card(s: Session, contact_id: int) -> dict:
     if company and name and (name.startswith(("(", "+")) or "@" in name):
         name = f"{company.name} {'office' if name.startswith(('(', '+')) else 'email'}"
     return {
-        "id": c.id, "name": name, "role": c.role,
+        "id": c.id, "name": name, "role": c.role, "kind": c.kind or ("office" if company else "person"),
+        "private": company is None,
         "company": company.name if company else None, "company_id": c.company_id,
         "phones": [format_phone(p.value) for p in points if p.kind == "phone"],
         "emails": [p.value for p in points if p.kind == "email"],
@@ -378,7 +415,7 @@ def contact_detail(s: Session, contact_id: int) -> dict | None:
     a = _contact_units(s, [c.id]).get(c.id)
     card = contact_card(s, c.id)
     ctx = Ctx(s)
-    units = [unit_summary(ctx, uid) for uid in sorted(a["units"])] if a else []
+    units = [_public(unit_summary(ctx, uid)) for uid in sorted(a["units"])] if a else []
     names = [n.name for n in s.query(ContactName).filter_by(contact_id=c.id).all()]
     mentions = (s.query(ContactMention).filter(ContactMention.contact_id == c.id).order_by(ContactMention.id.desc()).limit(50).all())
     suggestions = []
@@ -428,3 +465,70 @@ def list_companies(s: Session) -> list[dict]:
                     "relay_addresses": relay})
     out.sort(key=lambda x: -x["unit_count"])
     return out
+
+
+# ------------------------------------------------------------ owners / leads
+
+
+def list_owners(s: Session) -> list[dict]:
+    """Owner entities (LLCs / people) behind buildings, with what they own."""
+    ctx = Ctx(s)
+    units_by_building: dict[int, list[int]] = defaultdict(list)
+    for uid, u in ctx.units.items():
+        if not u.merged_into_id and uid in ctx.listings_by_unit:
+            units_by_building[u.building_id].append(uid)
+    out: dict[int, dict] = {}
+    companies = {c.id: c for c in s.query(Company).all()}
+    for bo in s.query(BuildingOwner).all():
+        co = companies.get(bo.company_id)
+        if co is None:
+            continue
+        o = out.setdefault(co.id, {"id": co.id, "name": co.name, "kind": co.kind, "phones": set(),
+                                    "managers": set(), "buildings": [], "unit_ids": [], "notes": co.notes})
+        b = ctx.buildings.get(bo.building_id)
+        mgr = companies.get(bo.manager_company_id)
+        if mgr:
+            o["managers"].add(mgr.name)
+        if bo.phone:
+            o["phones"].add(format_phone(bo.phone))
+        if b:
+            o["buildings"].append({"id": b.id, "address": b.display_address, "lat": b.lat, "lon": b.lon,
+                                   "listing_url": (bo.evidence or {}).get("listing_url"),
+                                   "units_listed": (bo.evidence or {}).get("available_units"),
+                                   "unit_ids": units_by_building.get(b.id, [])})
+            o["unit_ids"] += units_by_building.get(b.id, [])
+    rows = []
+    for o in out.values():
+        o["phones"], o["managers"] = sorted(o["phones"]), sorted(o["managers"])
+        o["building_count"], o["unit_count"] = len(o["buildings"]), len(set(o["unit_ids"]))
+        rows.append(o)
+    rows.sort(key=lambda x: (-x["building_count"], x["name"]))
+    return rows
+
+
+def list_leads(s: Session) -> list[dict]:
+    """Posts from people (bookmarklet / email / Craigslist without address) for triage."""
+    sources = {x.id: x for x in s.query(Source).all()}
+    lead_sources = [sid for sid, src in sources.items() if src.platform in ("manual", "email")]
+    q = s.query(SourceListing).filter(
+        (SourceListing.source_id.in_(lead_sources)) | (SourceListing.unit_id.is_(None)))
+    rows = []
+    for sl in q.order_by(SourceListing.first_seen.desc()).all():
+        snap = s.get(ListingSnapshot, sl.latest_snapshot_id) if sl.latest_snapshot_id else None
+        if snap is None:
+            continue
+        flags = text_flags(f"{snap.title or ''}\n{snap.description or ''}")
+        score = sum(p for p, _, _ in flags)
+        rows.append({
+            "source_listing_id": sl.id, "source_id": sl.source_id,
+            "source": sources[sl.source_id].name if sl.source_id in sources else sl.source_id,
+            "url": sl.url if not sl.url.startswith("btv:") else None, "status": sl.status,
+            "triage": sl.triage or "new", "unit_id": sl.unit_id, "address_override": sl.address_override,
+            "title": snap.title, "text": snap.description, "rent": snap.rent, "beds": snap.beds,
+            "address": snap.address_raw, "author": (snap.extra or {}).get("author"),
+            "received_at": (snap.extra or {}).get("received_at") or _iso(sl.first_seen),
+            "availability": {"raw": snap.avail_text_raw, "date": _iso(snap.avail_text_date), "kind": snap.avail_text_kind},
+            "risk": {"level": "high" if score >= 5 else "medium" if score >= 3 else "low" if score else "none",
+                     "score": score, "reasons": [{"points": p, "reason": r, "evidence": e} for p, r, e in flags]},
+        })
+    return rows

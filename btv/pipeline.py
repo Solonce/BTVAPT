@@ -115,7 +115,9 @@ def link_listing(session: Session, sl: SourceListing, snap: ListingSnapshot, sou
     if sl.link_locked:
         return resolve_unit(session, sl.unit_id)
     source = source or session.get(Source, sl.source_id)
-    na = normalize_address(snap.address_raw, snap.unit_raw, default_city=(source.config or {}).get("default_city"))
+    raw = sl.address_override or snap.address_raw
+    na = normalize_address(raw, None if sl.address_override else snap.unit_raw,
+                           default_city=(source.config or {}).get("default_city"))
     if na is None or not na.street:
         return resolve_unit(session, sl.unit_id)
     extra = snap.extra or {}
@@ -153,11 +155,14 @@ def _point(session: Session, kind: str, value: str) -> ContactPoint | None:
     return session.query(ContactPoint).filter_by(kind=kind, value=value).one_or_none()
 
 
-def resolve_mention(session: Session, m: Mention, company: Company) -> tuple[Contact | None, str, int | None]:
+PRIVATE_PLATFORMS = ("craigslist", "manual", "email")
+
+
+def resolve_mention(session: Session, m: Mention, company: Company | None) -> tuple[Contact | None, str, int | None]:
     """Returns (contact, review_state, suggested_contact_id)."""
     if m.email and is_relay_email(m.email):
         if _point(session, "email", m.email) is None:
-            session.add(ContactPoint(kind="email", value=m.email, company_id=company.id))
+            session.add(ContactPoint(kind="email", value=m.email, company_id=company.id if company else None))
             session.flush()
         m.email = None
         if not (m.name or m.phone):
@@ -173,8 +178,9 @@ def resolve_mention(session: Session, m: Mention, company: Company) -> tuple[Con
     review, suggested = "auto", None
     if contact is None and m.name:
         best, best_score = None, 0.0
+        same_owner = Contact.company_id == company.id if company else Contact.company_id.is_(None)
         for cn in (session.query(ContactName).join(Contact, Contact.id == ContactName.contact_id)
-                   .filter(Contact.company_id == company.id, Contact.merged_into_id.is_(None)).all()):
+                   .filter(same_owner, Contact.merged_into_id.is_(None)).all()):
             score = name_similarity(m.name, cn.name)
             if score > best_score:
                 best, best_score = cn, score
@@ -184,7 +190,9 @@ def resolve_mention(session: Session, m: Mention, company: Company) -> tuple[Con
             review, suggested = "needs_review", best.contact_id
     if contact is None:
         label = m.name or format_phone(m.phone) or m.email
-        contact = Contact(display_name=label, company_id=company.id, role=m.extra.get("role"))
+        kind = "person" if m.name else ("office" if m.origin == "contact_block" else "unknown")
+        contact = Contact(display_name=label, company_id=company.id if company else None, role=m.extra.get("role"),
+                          kind=kind if company else "person")
         session.add(contact)
         session.flush()
     while contact.merged_into_id:
@@ -196,11 +204,14 @@ def resolve_mention(session: Session, m: Mention, company: Company) -> tuple[Con
         # Prefer a person's name over a phone-number label.
         if contact.display_name and contact.display_name.startswith(("(", "+")):
             contact.display_name = m.name
+        if contact.kind != "person" and m.origin == "description":
+            contact.kind = "person"
     for kind, value in (("email", m.email), ("phone", m.phone)):
         if value:
             cp = _point(session, kind, value)
             if cp is None:
-                session.add(ContactPoint(kind=kind, value=value, contact_id=contact.id, company_id=company.id))
+                session.add(ContactPoint(kind=kind, value=value, contact_id=contact.id,
+                                         company_id=company.id if company else None))
             elif cp.contact_id is None:
                 cp.contact_id = contact.id
     session.flush()
@@ -208,14 +219,14 @@ def resolve_mention(session: Session, m: Mention, company: Company) -> tuple[Con
 
 
 def extract_contacts(session: Session, sl: SourceListing, snap: ListingSnapshot, source: Source) -> int:
-    company = company_for_source(session, source)
+    company = None if source.platform in PRIVATE_PLATFORMS else company_for_source(session, source)
     session.query(ContactMention).filter_by(snapshot_id=snap.id).delete()
     n = 0
     for m in extract_mentions(snap.contact_raw, snap.description):
         contact, review, suggested = resolve_mention(session, m, company)
         session.add(ContactMention(
             snapshot_id=snap.id, source_listing_id=sl.id, contact_id=contact.id if contact else None,
-            company_id=company.id, name_raw=m.name, phone=m.phone, email=m.email, origin=m.origin,
+            company_id=company.id if company else None, name_raw=m.name, phone=m.phone, email=m.email, origin=m.origin,
             confidence=m.confidence, review_state=review, suggested_contact_id=suggested,
         ))
         n += 1

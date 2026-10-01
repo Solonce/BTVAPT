@@ -14,6 +14,8 @@ from btv.models import Job
 log = logging.getLogger("btv.worker")
 
 BACKUP_EVERY = timedelta(hours=24)
+# Daily housekeeping jobs: kind -> interval.
+DAILY = {"backup": timedelta(hours=24), "owners": timedelta(hours=24), "inbox": timedelta(minutes=30)}
 
 
 class Worker:
@@ -43,16 +45,20 @@ class Worker:
     def _schedule(self) -> None:
         # scrape_due is cheap and just enqueues per-source scrapes.
         enqueue("scrape_due", cfg=self.cfg)
-        with session_scope(self.cfg) as s:
-            last = (
-                s.query(Job)
-                .filter(Job.kind == "backup", Job.status.in_(("succeeded", "queued", "running")))
-                .order_by(Job.id.desc())
-                .first()
-            )
-            due = last is None or (last.status == "succeeded" and utcnow() - (last.finished_at or last.created_at) >= BACKUP_EVERY)
-        if due:
-            enqueue("backup", cfg=self.cfg)
+        for kind, every in DAILY.items():
+            if kind == "inbox" and not self.cfg.extra.get("inbox"):
+                continue  # email ingestion only runs when configured
+            with session_scope(self.cfg) as s:
+                last = (
+                    s.query(Job)
+                    .filter(Job.kind == kind, Job.status.in_(("succeeded", "failed", "queued", "running")))
+                    .order_by(Job.id.desc())
+                    .first()
+                )
+                due = last is None or (last.status in ("succeeded", "failed")
+                                       and utcnow() - (last.finished_at or last.created_at) >= every)
+            if due:
+                enqueue(kind, cfg=self.cfg)
 
     def run_forever(self) -> None:
         log.info("worker started")
