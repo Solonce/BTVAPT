@@ -131,7 +131,8 @@ document.addEventListener("keydown", (e) => {
 // ============================================================ settings
 async function loadSettings() {
   state.settings = await api.get("/api/settings");
-  $("#moveinLabel").textContent = `${fmtDate(state.settings.target_move_in, { month: "short", day: "numeric", year: "numeric" })} ± ${state.settings.near_miss_days}d`;
+  const narrow = window.innerWidth <= 520;
+  $("#moveinLabel").textContent = `${fmtDate(state.settings.target_move_in, narrow ? { month: "short", day: "numeric" } : { month: "short", day: "numeric", year: "numeric" })} ± ${state.settings.near_miss_days}d`;
 }
 $("#moveinBtn").addEventListener("click", (e) => {
   const s = state.settings;
@@ -358,7 +359,7 @@ function cardHTML(u) {
       <div class="r1"><span class="price num">${money(u.rent)}<small> /mo</small></span>${matchPill(a, true)}</div>
       <div class="addr ${u.status === "gone" ? "gone" : ""}" title="${esc(u.address)}">${esc((u.address || "Address not given").split(",")[0])}${u.unit ? ` <span class="muted">#${esc(u.unit)}</span>` : ""}</div>
       <div class="meta"><span>${bedsLabel(u.beds)}</span><span>${u.baths ?? "?"} bath</span>${u.sqft ? `<span>${u.sqft} ft²</span>` : ""}<span>${esc(u.city || "")}</span></div>
-      <div class="meta"><span>${availText(a)}</span>${walk ? `<span class="walk">${walk}</span>` : ""}</div>
+      <div class="meta"><span>${availText(a)}</span>${walk ? `<span class="walk">${u.approximate ? "~" : ""}${walk}</span>` : ""}</div>
       <div class="foot">${riskPill(u.risk)}${u.private_landlord ? `<span class="pill accent">Private landlord</span>` : ""}${u.status !== "available" ? `<span class="pill neutral s-${u.status}">${u.status}</span>` : ""}${u.prefs.status ? `<span class="pill neutral">${esc(u.prefs.status)}</span>` : ""}<span class="faint">${esc(src)}</span></div>
     </div>
   </article>`;
@@ -504,6 +505,8 @@ function sparkline(points) {
 }
 function riskPanel(r) {
   if (!r) return "";
+  if (r.level === "verified" && r.syndicated_from && !r.verified_source) return `<div class="panel ok"><div class="head"><span class="big">Reposted by the property manager</span><span class="pill r-verified">Matches manager</span></div>
+    <div class="ev">Same text, address and price as ${esc(r.syndicated_from)}. Contact the manager directly to be safe.</div></div>`;
   if (r.level === "verified") return `<div class="panel ok"><div class="head"><span class="big">Listed on a property manager's own site</span><span class="pill r-verified">Verified source</span></div>
     <div class="ev">Comes straight from the manager's listings system, so it isn't a copy someone reposted.</div></div>`;
   if (r.level === "none") return `<div class="panel"><div class="head"><span class="big">No scam signals found</span></div><div class="ev">Still: tour in person and never pay before seeing the unit and signing a lease.</div></div>`;

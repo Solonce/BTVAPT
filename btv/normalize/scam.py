@@ -12,6 +12,7 @@ comparing untrusted listings against manager-site listings.
 
 from __future__ import annotations
 
+import math
 import re
 import statistics
 from collections import Counter, defaultdict
@@ -42,6 +43,7 @@ class Risk:
     score: int = 0
     reasons: list[dict] = field(default_factory=list)
     verified_source: bool = False
+    syndicated_from: str | None = None  # repost of a manager's own listing
 
     def add(self, points: int, reason: str, evidence: str | None = None, kind: str = "text") -> None:
         self.score += points
@@ -49,7 +51,7 @@ class Risk:
 
     @property
     def level(self) -> str:
-        if self.verified_source and self.score < 3:
+        if (self.verified_source or self.syndicated_from) and self.score < 3:
             return "verified"
         if self.score >= 5:
             return "high"
@@ -61,7 +63,7 @@ class Risk:
 
     def as_dict(self) -> dict:
         return {"level": self.level, "score": self.score, "reasons": self.reasons,
-                "verified_source": self.verified_source}
+                "verified_source": self.verified_source, "syndicated_from": self.syndicated_from}
 
 
 def text_flags(text: str | None) -> list[tuple[int, str, str]]:
@@ -126,20 +128,46 @@ class ScamIndex:
                 for uid, n in hits.most_common(1):
                     other = self.trusted_shingles[uid]
                     jac = n / len(sh | other)
-                    if jac >= 0.35:
-                        o = self.units[uid]
-                        r.add(4, "Text copied from a property manager's listing",
-                              f"{round(jac * 100)}% match with {o['sources'][0]['source']} at {o['address']}", "copy")
+                    if jac < 0.35:
+                        continue
+                    o = self.units[uid]
+                    where = f"{o['sources'][0]['source']} at {o['address']}"
+                    if not _same_place(o, unit):
+                        r.add(4, "Text copied from a property manager's listing at a different address",
+                              f"{round(jac * 100)}% match with {where}", "copy")
+                    elif unit.get("rent") and o.get("rent") and unit["rent"] < 0.85 * o["rent"]:
+                        r.add(4, "Same place listed cheaper than the property manager's price",
+                              f"${unit['rent']:,} here vs ${o['rent']:,} from {o['sources'][0]['source']}", "copy")
+                    else:
+                        r.syndicated_from = where
             for p in photos:
                 uid = self.photo_owner.get(_photo_key(p))
-                if uid and uid != unit["id"]:
+                if uid and uid != unit["id"] and not _same_place(self.units[uid], unit):
                     o = self.units[uid]
                     r.add(4, "Uses a photo from a property manager's listing",
                           f"same photo as {o['sources'][0]['source']} at {o['address']}", "copy")
                     break
-            if not unit.get("address"):
-                r.add(1, "No street address given", None, "address")
+            if not unit.get("address") or unit.get("approximate"):
+                r.add(1, "No street address given (map pin only)", None, "address")
         return r.as_dict()
+
+
+def _same_place(a: dict, b: dict) -> bool:
+    """Same building, or within ~150 m (address spellings differ: '140 Pine' vs '140-142 Pine St').
+
+    Pin-only posts (Craigslist offsets pins for privacy) count as the same place
+    within ~2 km when the rent is also within 10%."""
+    if a.get("building_id") is not None and a.get("building_id") == b.get("building_id"):
+        return True
+    if None in (a.get("lat"), a.get("lon"), b.get("lat"), b.get("lon")):
+        return a.get("building_id") == b.get("building_id")
+    dlat = (a["lat"] - b["lat"]) * 111_000
+    dlon = (a["lon"] - b["lon"]) * 111_000 * math.cos(math.radians(a["lat"]))
+    dist = math.hypot(dlat, dlon)
+    if a.get("approximate") or b.get("approximate"):
+        ra, rb = a.get("rent"), b.get("rent")
+        return dist < 2000 and bool(ra and rb) and abs(ra - rb) <= 0.1 * max(ra, rb)
+    return dist < 150
 
 
 def _trusted(u: dict) -> bool:

@@ -122,3 +122,17 @@ def test_api_units_contacts_actions(cfg, file_source):
         # Changing the target date re-classifies at view time.
         c.put("/api/settings", json={"target_move_in": "2027-09-01", "near_miss_days": 30})
         assert c.get(f"/api/units/{uid}").json()["availability"]["match"] == "early"
+
+
+def test_addressless_post_with_pin_gets_approximate_location(cfg, file_source):
+    file_source([listing("p1", address_raw=None, lat=44.4761, lon=-73.2123, approx_location="Old North End",
+                         description="Sunny room, $800, available June 1st 2027."),
+                 listing("p2", address_raw=None, lat=44.4761, lon=-73.2123, rent=2100,
+                         description="Whole 3 bedroom house, available August.")])
+    scrape(cfg)
+    with session_scope(cfg) as s:
+        units = views.list_units(s)["units"]
+        assert len(units) == 2  # same pin, different posts: never merged
+        u = next(x for x in units if x["rent"] == 1500)
+    assert u["approximate"] and u["lat"] == 44.4761 and "Old North End" in u["address"]
+    assert any("map pin only" in r["reason"] for r in u["risk"]["reasons"])

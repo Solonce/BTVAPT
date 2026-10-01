@@ -135,3 +135,51 @@ def test_leads_api_flow(cfg):
         placed = c.put(f"/api/leads/{r2['source_listing_id']}", json={"address": "12 Pearl St, Burlington, VT", "triage": "saved"}).json()
         assert placed["unit_id"] and placed["triage"] == "saved"
         assert c.post("/api/leads", json={"text": ""}).status_code == 400
+
+
+def test_scam_syndication_vs_copy():
+    text = ("Sunny two bedroom apartment on a quiet street near downtown with hardwood floors, "
+            "a big porch, off street parking and laundry in the basement. Heat and hot water included.")
+    mgr = dict(_unit(1, "appfolio", 2000), building_id=10)
+    repost = dict(_unit(2, "craigslist", 2000), building_id=10)       # manager syndicating
+    copycat = dict(_unit(3, "craigslist", 1950), building_id=99)      # same text, other address
+    undercut = dict(_unit(4, "craigslist", 1300), building_id=10)     # same place, much cheaper
+    units = [mgr, repost, copycat, undercut]
+    idx = ScamIndex(units, {u["id"]: text for u in units}, {u["id"]: [] for u in units})
+    r = idx.assess(repost, text, [])
+    assert r["level"] == "verified" and "appfolio" in r["syndicated_from"]
+    assert any("different address" in x["reason"] for x in idx.assess(copycat, text, [])["reasons"])
+    assert any("cheaper" in x["reason"] for x in idx.assess(undercut, text, [])["reasons"])
+    # Different building record but ~50 m away (address spelled differently) = same place.
+    nearby = dict(_unit(5, "craigslist", 2000), building_id=77, lat=mgr["lat"] + 0.0004)
+    mgr["lon"] = nearby["lon"] = -73.21
+    assert idx.assess(nearby, text, [])["level"] == "verified"
+
+
+def test_unitless_repost_links_to_manager_unit(cfg, file_source, tmp_path, monkeypatch):
+    from btv.db import session_scope
+    from btv.models import SourceListing
+
+    from .conftest import listing
+
+    text = ("Bright corner two bedroom on the second floor with hardwood floors throughout, a sunny "
+            "porch, dishwasher, coin-op laundry in the basement and one off street parking spot.")
+    file_source([listing("m1", address_raw="94 Malletts Bay Ave - 2, Winooski, VT", description=text)])
+    with session_scope(cfg) as s:
+        s.get(Source, "demo").platform = "appfolio_test"
+    # treat the demo source as a manager site for this test
+    import btv.pipeline as pl
+    import btv.sources.base as base
+    from btv.sources.file import FileAdapter
+
+    monkeypatch.setattr(pl, "TRUSTED_LINK_PLATFORMS", pl.TRUSTED_LINK_PLATFORMS + ("appfolio_test",))
+    monkeypatch.setitem(base.PLATFORMS, "appfolio_test", FileAdapter)
+    runner.run_inline("scrape", source_id="demo", cfg=cfg)
+    p = tmp_path / "cl.json"
+    p.write_text(json.dumps([listing("c1", address_raw="94 Malletts Bay Avenue, Winooski, VT", description=text + " Call us!")]))
+    with session_scope(cfg) as s:
+        s.add(Source(id="cl", name="CL", platform="file", config={"path": str(p)}, interval_minutes=60))
+    runner.run_inline("scrape", source_id="cl", cfg=cfg)
+    with session_scope(cfg) as s:
+        units = {sl.source_id: sl.unit_id for sl in s.query(SourceListing)}
+    assert units["demo"] == units["cl"]

@@ -22,7 +22,8 @@ _NOT_NAMES = {"Us", "Today", "Now", "For", "The", "Our", "Five", "Stone", "Pleas
 # Words that mean the "name" is really a company or a verb phrase ("Owner Pays").
 _NON_NAME_WORDS = {"pays", "pay", "property", "properties", "management", "real", "realty", "group", "llc", "inc",
                    "office", "team", "leasing", "rentals", "apartments", "us", "our", "today", "now", "responsible",
-                   "covers", "provides", "handles", "will", "is", "at", "for"}
+                   "covers", "provides", "handles", "will", "is", "at", "for", "we", "i", "me", "you", "them",
+                   "him", "her", "redstone", "anytime", "today", "tomorrow", "soon", "back", "now"}
 _COMPANY_AFTER = re.compile(r"^\s*(?:property|properties|management|realty|group|llc|inc|rentals|associates)\b", re.I)
 
 # Per-listing relay addresses from showing services: attribute to the company, not a person.

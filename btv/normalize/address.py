@@ -39,7 +39,7 @@ KNOWN_CITIES = {
 }
 
 UNIT_WORDS = r"(?:(?:apt|apartment|unit|ste|suite|no|rm|room|fl|floor)\b\.?|#)"
-_UNIT_RE = re.compile(rf"(?:^|[\s,])(?:{UNIT_WORDS})\s*#?\s*([a-z0-9][a-z0-9/-]*)", re.I)
+_UNIT_RE = re.compile(rf"(?:^|[\s,])(?:{UNIT_WORDS})\s*[:#]?\s*([a-z0-9][a-z0-9/-]*)", re.I)
 
 
 @dataclass

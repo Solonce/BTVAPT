@@ -22,6 +22,7 @@ REF = date(2026, 9, 30)
     ("78 Eastwood Drive, #411, South Burlington, VT 05403", None, "78 eastwood dr|south burlington|vt", "411"),
     ("383 College Street, Suite 2D, Burlington, VT 05401", "Suite 2D", "383 college st|burlington|vt", "2d"),
     ("6 1/2  N. Winooski Ave, Apt #301, Burlington, VT", None, "6 1/2 n winooski ave|burlington|vt", "301"),
+    ("24-28 North Street Unit:3C, Burlington, VT", None, "24-28 n st|burlington|vt", "3c"),
 ])
 def test_address_normalization(raw, unit, key, norm_unit):
     a = normalize_address(raw, unit)

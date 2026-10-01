@@ -57,7 +57,8 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -.015em; }
 .brand:hover { text-decoration: none; }
 .brand .mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; }
 .brand .mark svg { width: 16px; height: 16px; fill: var(--accent-ink); }
-.nav { display: flex; gap: 2px; padding: 3px; background: var(--sunken); border-radius: 10px; }
+.nav { display: flex; gap: 2px; padding: 3px; background: var(--sunken); border-radius: 10px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.nav::-webkit-scrollbar, .seg::-webkit-scrollbar { display: none; }
 .nav a { padding: 6px 14px; border-radius: 8px; color: var(--muted); font-weight: 550; font-size: 13.5px; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 6px; }
 .nav a:hover { color: var(--ink); text-decoration: none; }
@@ -65,8 +66,8 @@ h1, h2, h3, h4 { margin: 0; letter-spacing: -.015em; }
 .nav .count { background: var(--accent); color: var(--accent-ink); border-radius: 999px; font-size: 11px; padding: 0 6px; font-weight: 650; }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--unknown); display: inline-block; }
 .dot.ok { background: var(--ok); } .dot.bad { background: var(--risk); }
-.movein { margin-left: auto; position: relative; }
-.movein-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 10px; border: 1px solid var(--line-2); background: var(--surface);
+.movein { margin-left: auto; position: relative; flex-shrink: 0; }
+.movein-btn { display: flex; align-items: center; gap: 8px; white-space: nowrap; padding: 6px 12px 6px 10px; border: 1px solid var(--line-2); background: var(--surface);
   border-radius: 999px; cursor: pointer; font-size: 13px; }
 .movein-btn:hover { border-color: var(--ink-2); }
 .movein-btn b { font-weight: 650; }
@@ -109,7 +110,7 @@ textarea.field { resize: vertical; line-height: 1.45; }
 .chip.dashed { cursor: default; background: transparent; border-style: dashed; color: var(--muted); }
 .chip .x { border: 0; background: none; padding: 0; margin-left: 2px; cursor: pointer; color: inherit; opacity: .6; font-size: 11px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.seg { display: inline-flex; padding: 3px; background: var(--sunken); border-radius: 10px; gap: 2px; }
+.seg { display: inline-flex; padding: 3px; background: var(--sunken); border-radius: 10px; gap: 2px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .seg button { border: 0; background: none; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px; color: var(--muted); font-weight: 550; white-space: nowrap; }
 .seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
@@ -127,6 +128,8 @@ textarea.field { resize: vertical; line-height: 1.45; }
 
 /* explore (list + map) -------------------------------------------------------- */
 .explore { display: grid; grid-template-columns: minmax(420px, 470px) 1fr; height: calc(100vh - var(--top)); }
+.listpane, .mappane, .lc .body, .lc .r1 { min-width: 0; }
+body { overflow-x: hidden; }
 .listpane { display: flex; flex-direction: column; min-height: 0; background: var(--bg); border-right: 1px solid var(--line); }
 .listhead { padding: 16px 18px 10px; display: flex; flex-direction: column; gap: 12px; }
 .listhead .title { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
@@ -326,4 +329,24 @@ table.t tr:last-child td { border-bottom: 0; }
   .drawer { width: 100vw; }
   .mapctl.tc { top: 10px; } .legend { display: none; }
 }
-@media (max-width: 420px) { .nav a span.lbl { display: none; } }
+@media (max-width: 520px) {
+  .topbar { gap: 8px; padding: 0 10px; }
+  .brand .mark { width: 26px; height: 26px; }
+  .nav { padding: 2px; }
+  .nav a { padding: 5px 7px; font-size: 12.5px; gap: 4px; }
+  .movein-btn { padding: 5px 9px; font-size: 12px; gap: 5px; }
+  .movein-btn svg { display: none; }
+  .brand { display: none; }
+  .nav a[data-tab="health"] .lbl { display: none; }
+  .nav a[data-tab="health"] { padding: 5px 9px; }
+  .phead .search { width: 100% !important; }
+  .listhead { padding: 12px 12px 8px; }
+  .listhead .title { flex-wrap: wrap; row-gap: 2px; }
+  .listhead h1 { font-size: 17px; }
+  .results { padding: 4px 6px 80px; }
+  .lc { grid-template-columns: 96px 1fr; gap: 10px; padding: 8px; }
+  .lc .ph { width: 96px; height: 84px; }
+  .lc .price { font-size: 15.5px; }
+  .page { padding: 18px 12px 60px; }
+  .phead h1 { font-size: 22px; }
+}

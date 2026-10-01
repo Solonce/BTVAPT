@@ -111,6 +111,49 @@ def find_or_create_unit(session: Session, building: Building, norm_unit: str, la
     return resolve_unit(session, u.id) or u
 
 
+TRUSTED_LINK_PLATFORMS = ("buildium", "nesthub", "appfolio", "rentcafe")
+APPROX_PREFIX = "~"
+
+
+def _approximate_address(extra: dict) -> NormalizedAddress | None:
+    """Posts with only a map pin (Craigslist without a street address) become an
+    approximate 'building' at that point (~100 m grid), so they show on the map."""
+    lat, lon = extra.get("lat"), extra.get("lon")
+    if lat is None or lon is None:
+        return None
+    where = (extra.get("approx_location") or "").strip()
+    label = f"Approximate location{' — ' + where if where else ''}"
+    return NormalizedAddress(street_number=None, street=f"{APPROX_PREFIX}{float(lat):.3f},{float(lon):.3f}",
+                             city=None, state="vt", zip=None, unit="", display=label)
+
+
+def _match_manager_unit_by_text(session: Session, building: Building, snap: ListingSnapshot) -> Unit | None:
+    """A unit-less repost (e.g. a manager syndicating to Craigslist) whose text
+    matches a manager-site listing in the same building is the same unit."""
+    from btv.normalize.scam import shingles
+
+    mine = shingles(snap.description)
+    if len(mine) < 8:
+        return None
+    best, best_j = None, 0.0
+    rows = (session.query(SourceListing, ListingSnapshot, Source)
+            .join(ListingSnapshot, ListingSnapshot.id == SourceListing.latest_snapshot_id)
+            .join(Source, Source.id == SourceListing.source_id)
+            .join(Unit, Unit.id == SourceListing.unit_id)
+            .filter(Unit.building_id == building.id, Source.platform.in_(TRUSTED_LINK_PLATFORMS),
+                    SourceListing.status != "gone").all())
+    for other_sl, other_snap, _ in rows:
+        theirs = shingles(other_snap.description)
+        if not theirs:
+            continue
+        j = len(mine & theirs) / len(mine | theirs)
+        if j > best_j:
+            best, best_j = other_sl, j
+    if best is not None and best_j >= 0.5:
+        return resolve_unit(session, best.unit_id)
+    return None
+
+
 def link_listing(session: Session, sl: SourceListing, snap: ListingSnapshot, source: Source | None = None) -> Unit | None:
     if sl.link_locked:
         return resolve_unit(session, sl.unit_id)
@@ -118,18 +161,29 @@ def link_listing(session: Session, sl: SourceListing, snap: ListingSnapshot, sou
     raw = sl.address_override or snap.address_raw
     na = normalize_address(raw, None if sl.address_override else snap.unit_raw,
                            default_city=(source.config or {}).get("default_city"))
+    extra = snap.extra or {}
+    if (na is None or not na.street) and not sl.address_override:
+        approx = _approximate_address(extra)
+        if approx is None:
+            return resolve_unit(session, sl.unit_id)
+        # Many posts share a neighbourhood pin: never merge them by location alone.
+        approx.unit = f"post-{sl.id}"
+        na = approx
     if na is None or not na.street:
         return resolve_unit(session, sl.unit_id)
-    extra = snap.extra or {}
     building = find_or_create_building(session, na, extra.get("lat"), extra.get("lon"))
-    unit = find_or_create_unit(session, building, na.unit, snap.unit_raw)
+    unit = None
+    if not na.unit and source.platform not in TRUSTED_LINK_PLATFORMS:
+        unit = _match_manager_unit_by_text(session, building, snap)
+    unit = unit or find_or_create_unit(session, building, na.unit, snap.unit_raw)
     current = resolve_unit(session, sl.unit_id)
     if current is None or current.id != unit.id:
         session.add(MergeLog(
             action="link_listing",
             subject={"source_listing_id": sl.id, "from_unit_id": sl.unit_id, "to_unit_id": unit.id,
-                     "building_key": na.building_key, "norm_unit": na.unit},
-            reason="address match" if current is None else "address changed",
+                     "building_key": na.building_key, "norm_unit": unit.norm_unit},
+            reason=("text matches manager listing in same building" if unit.norm_unit != na.unit else "address match")
+                   if current is None else "address changed",
             actor="auto",
         ))
         sl.unit_id = unit.id
