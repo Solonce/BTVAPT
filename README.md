@@ -12,22 +12,53 @@ a fallback (one browser context at a time).
 
 ## What it does
 
-- **Map** (`/`): every unit on an OpenStreetMap map, coloured by how its
-  move-in date compares to your target (on target / near miss / early / late).
-  Filter by search, rent, beds, town, your tags and status. Click a unit for
-  photos, availability evidence (the description quote that set the date),
-  amenities (source-listed plus ones mentioned in the text, marked as such),
-  every source link, price history, status timeline, contacts, predicted next
-  turnover, and dedupe controls. Your rating, status, tags and notes live on
-  the canonical unit and survive relists, edits and merges.
-- **Contacts**: companies and contacts behind listings, how many units and
-  buildings each is linked to (multi-property highlighted), rent range, when
-  their units tend to get listed, an outreach log, notes, and merge/review.
-- **Health**: per-source state, live job progress bars with ETA, run/kill
-  switch per source, recent jobs, backups.
+- **Explore** (`/`): every unit on a map (clustered, Clean/Detailed/Satellite
+  basemaps) and in a list, coloured by how its move-in date compares to your
+  target. Filter pills for price, beds, town, pets, private landlords, scams,
+  your tags/status; "only what's on the map"; right-click to drop a pin (work,
+  campus) and see walking times. The unit panel shows photos, the exact text
+  that set the move-in date, a scam check, your rating/status/tags/notes, who
+  owns and manages it, every source link, price and status history and a
+  turnover estimate.
+- **Inbox**: posts from people. A bookmarklet saves any Facebook group post,
+  Marketplace listing, Front Porch Forum post or web page in one click;
+  pasting works too; an optional IMAP reader picks up forwarded notification
+  emails. Leads get date parsing, address mapping, contact matching and scam
+  checks, plus New/Keep/Contacted/Dismiss triage.
+- **People**: owners (LLCs and people behind buildings), individuals (private
+  landlords from Craigslist and saved posts) and property managers, each with
+  their places, listing seasonality, outreach log and notes.
+- **Health**: per-source status with pause/run, live job progress, backups.
 
-The target move-in date and near-miss window (top bar) are view settings only;
-ingest always keeps everything.
+The target move-in date and near-miss window are view settings only; ingest
+always keeps everything.
+
+### Scam checks
+
+Every listing gets a transparent score with reasons: payment by wire/gift
+card/crypto, deposit to hold before a showing, "I'm out of the country",
+"keys will be mailed", rent far below comparable units, and above all text
+or photos copied from a property manager's real listing (the most common
+local scam). Manager-site listings are marked as verified sources. Likely
+scams are hidden by default (toggle under More).
+
+### Facebook, Front Porch Forum and other people-posted rentals
+
+Facebook can't be scraped reliably or within its terms, so the app meets you
+where you browse: drag **Save to BTV** from the Inbox page to your bookmarks
+bar, then click it on any post. For hands-off capture, create a dedicated
+Gmail, point Facebook group notifications and Front Porch Forum digests at
+it, and add to `btv.toml`:
+
+```toml
+[inbox]
+host = "imap.gmail.com"
+user = "you.rentals@gmail.com"
+password = "gmail-app-password"   # or set BTV_INBOX_PASSWORD
+folder = "INBOX"
+```
+
+Rental-looking emails become leads every 30 minutes.
 
 ## Layout
 
@@ -43,7 +74,10 @@ ingest always keeps everything.
 | `btv/actions.py` | Notes/tags, merge/split/undo units, merge contacts, mention review, outreach |
 | `btv/health.py` | Run health checks (expected counts, sudden drops) and per-source dashboard state |
 | `btv/http.py` | Polite client: robots.txt, per-host rate limit, retries with backoff |
-| `btv/sources/` | Adapters: `buildium`, `nesthub`, `appfolio`, `file` (tests / manual paste-in) |
+| `btv/sources/` | Adapters: `buildium`, `nesthub`, `appfolio`, `craigslist`, `manual`/`email` (passive), `file` (tests) |
+| `btv/owners.py` | `owners` job: owner entities behind buildings from ShowMeTheRent |
+| `btv/inbox.py` | Leads from the bookmarklet/paste and the IMAP `inbox` job |
+| `btv/normalize/scam.py` | Scam risk scoring with reasons |
 | `btv/static/` | The UI: `index.html`, `app.js`, `app.css`, vendored Leaflet |
 | `btv/backup.py` | Online SQLite backup, gzip, 14 daily + 8 weekly retention |
 | `config/sources.toml` | Source definitions (synced into the DB) |
@@ -82,7 +116,16 @@ ingest always keeps everything.
 |---|---|---|
 | Hinsdale | `buildium` | `ApartmentSearch.aspx` holds every listing; detail/images pages add amenities and photos |
 | Five Seasons | `nesthub` | burlingtonproperty.management `/_system/api/listings` JSON (their Buildium public page is disabled) |
-| Stone & Browning, Fusion (fpmvt), RPM Sterling (rpmvt001), Distinctive (distinctivepm) | `appfolio` | Server-rendered list + detail pages; `robots_override = true` by explicit decision |
+| Stone & Browning, Fusion, RPM Sterling, Distinctive, Bissonette, Strong Will, Full Circle, Farrell, S.D. Ireland, Larkin, Nedde, Appletree Bay, Gardner, Queen City, Colchester PM | `appfolio` | Server-rendered list + detail pages; `robots_override = true` by explicit decision. Most were found via ShowMeTheRent. |
+| Craigslist | `craigslist` | The site's own search JSON (12 mi around 05401) + post pages; `/reply` (contact reveal) is never fetched. Wheeler PM lists only here. |
+| Owners | `owners` job | ShowMeTheRent's public search names the owner entity for AppFolio-managed buildings |
+| Saved by me / Email inbox | `manual` / `email` | Bookmarklet, paste and IMAP leads |
+| Redstone | `rentcafe` (disabled) | Behind a Cloudflare browser challenge; needs a Playwright adapter |
+
+Not covered: Zillow/Apartments.com (block automated access; their units are
+mostly the managers above), Facebook (bookmarklet/email instead), UVM
+off-campus housing and Seven Days classifieds (not reachable / no listings
+feed found).
 
 Detail pages are only refetched when a listing is new, its summary changed,
 or `detail_refresh_hours` (default 24) elapsed, so routine runs are one or
