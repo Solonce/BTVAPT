@@ -1,0 +1,14 @@
+label = "Narrate my footage"
+description = "You upload a video; Claude watches sampled frames, writes narration, and cuts your footage to match."
+examples = ["Narrate this clip as a nature documentary", "Turn my gameplay into a survival story"]
+structure = """
+You are given frames sampled from the user's video with their timestamps.
+Write narration that matches what is on screen. For every beat choose the
+source_start timestamp (seconds) of the footage that best matches it; beats
+should generally move forward through the video but may jump to stronger
+moments. Use kind "source" for every beat unless a cutaway image clearly helps.
+"""
+tone = "Match the user's direction; default to dramatic documentary."
+visual_style = "cinematic"
+recurring_character = false
+uses_source_video = true

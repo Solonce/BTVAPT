@@ -1,0 +1,17 @@
+# Copy to /etc/systemd/system/faceless-studio.service, adjust User/paths, then:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now faceless-studio
+[Unit]
+Description=Faceless Studio (web UI + autopilot worker)
+After=network-online.target tailscaled.service
+Wants=network-online.target
+
+[Service]
+User=YOUR_USER
+WorkingDirectory=/home/YOUR_USER/faceless-studio
+# Bind to the Tailscale IP only so the UI isn't exposed on your LAN/internet.
+ExecStart=/bin/sh -c 'exec .venv/bin/studio --host "$(tailscale ip -4 | head -1)" --port 8765'
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

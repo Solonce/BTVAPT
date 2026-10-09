@@ -1,0 +1,18 @@
+label = "Timeline story"
+description = "Second-person survival/experience timeline told hour by hour or day by day."
+examples = [
+  "What your last 48 hours in jail look like",
+  "The first 100 days of a zombie apocalypse",
+  "Your first 24 hours as a deep sea diver trapped at the bottom",
+  "What happens in your first week in the French Foreign Legion",
+]
+structure = """
+Second person ("you"), present tense. Open with a one-line hook that drops the
+viewer into the most intense moment, then rewind to the start of the timeline.
+Move forward with explicit time stamps ("Hour 3.", "Day 12.") that escalate.
+Every 2-3 beats add a twist, a gross/shocking detail, or a stakes jump.
+End on a cliffhanger, a dark punchline, or a question that invites comments.
+"""
+tone = "Tense, punchy, darkly funny. Short sentences. No filler, no 'in this video'."
+visual_style = "cinematic 3D animated render, dramatic rim lighting, expressive faces, rich color, high detail, film still"
+recurring_character = true

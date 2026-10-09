@@ -1,0 +1,16 @@
+label = "What if"
+description = "Escalating hypothetical scenario explained step by step."
+examples = [
+  "What if you fell into a black hole",
+  "What if the Earth stopped spinning for one second",
+  "What if you swallowed a live spider every night",
+]
+structure = """
+Hook with the most extreme consequence first. Then walk through the scenario
+in escalating stages, each one bigger than the last, mixing real-sounding facts
+with vivid sensory detail. Second person where it fits. End with the final,
+most absurd consequence.
+"""
+tone = "Curious, dramatic, a little unhinged. Short sentences."
+visual_style = "hyper-detailed digital illustration, cinematic composition, dramatic scale, volumetric light"
+recurring_character = false

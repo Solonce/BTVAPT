@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faceless Studio</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">Faceless Studio</div>
+  <nav id="tabs">
+    <button data-tab="create" class="active">Create</button>
+    <button data-tab="queue">Videos</button>
+    <button data-tab="topics">Topics</button>
+    <button data-tab="library">Library</button>
+    <button data-tab="formats">Formats</button>
+    <button data-tab="settings">Settings</button>
+  </nav>
+  <div id="statusbar" class="statusbar"></div>
+</header>
+
+<main>
+  <!-- CREATE -->
+  <section id="tab-create" class="tab active">
+    <div class="grid2">
+      <div class="card">
+        <h2>Make a video</h2>
+        <p class="muted">Leave the topic blank and it picks the next one from the topic pool.</p>
+        <label>Topic <input id="c-title" placeholder="e.g. Your last 48 hours on a sinking submarine"></label>
+        <div class="row">
+          <label>Format <select id="c-format"></select></label>
+          <label>Preset <select id="c-preset"></select></label>
+        </div>
+        <div class="row">
+          <label>Length (s) <input id="c-length" type="number" min="15" max="900" placeholder="default"></label>
+          <label>Approve script first <select id="c-approve"><option value="">default</option><option value="1">yes</option><option value="0">no</option></select></label>
+        </div>
+        <details>
+          <summary>More options for this video</summary>
+          <label>Extra direction for the writer <textarea id="c-notes" rows="2" placeholder="e.g. make the narrator a sarcastic prison guard"></textarea></label>
+          <div class="row">
+            <label>Vertical 9:16 <select id="c-vert"><option value="">default</option><option value="1">yes</option><option value="0">no</option></select></label>
+            <label>Horizontal 16:9 <select id="c-horiz"><option value="">default</option><option value="1">yes</option><option value="0">no</option></select></label>
+          </div>
+        </details>
+        <div class="actions">
+          <button class="primary" id="c-go">Generate</button>
+          <button id="c-auto">Surprise me</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Narrate my footage</h2>
+        <p class="muted">Upload a clip. Claude watches sampled frames, writes narration, and cuts your footage to match.</p>
+        <label>Video file <input id="u-file" type="file" accept="video/*"></label>
+        <label>Direction <input id="u-dir" placeholder="e.g. narrate like a dramatic nature documentary"></label>
+        <div class="row">
+          <label>Preset <select id="u-preset"></select></label>
+          <label>Length (s) <input id="u-length" type="number" min="15" max="900" placeholder="match clip"></label>
+        </div>
+        <div class="actions"><button class="primary" id="u-go">Upload &amp; generate</button></div>
+        <div id="u-progress" class="muted"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Autopilot</h2>
+      <div class="row wrap">
+        <label class="switch"><input type="checkbox" id="ap-on"> Autopilot on</label>
+        <label>Videos per day <input type="number" id="ap-vpd" min="1" max="48"></label>
+        <label>Monthly budget ($) <input type="number" id="ap-budget" min="0" step="1"></label>
+        <button id="ap-save">Save</button>
+      </div>
+      <p class="muted" id="ap-note"></p>
+    </div>
+
+    <div class="card">
+      <h2>Recent</h2>
+      <div id="recent" class="jobs"></div>
+    </div>
+  </section>
+
+  <!-- QUEUE -->
+  <section id="tab-queue" class="tab">
+    <div class="card"><h2>All videos</h2><div id="jobs" class="jobs"></div></div>
+  </section>
+
+  <!-- TOPICS -->
+  <section id="tab-topics" class="tab">
+    <div class="card">
+      <h2>Topic pool</h2>
+      <p class="muted">Autopilot pulls from here and refills the pool with Claude (using web trend research when it's on) once it runs low.</p>
+      <div class="row wrap">
+        <input id="t-new" placeholder="Add your own topic">
+        <select id="t-format"></select>
+        <button id="t-add">Add</button>
+        <button id="t-refill" class="primary">Refill with Claude</button>
+      </div>
+      <div class="row"><label>Show <select id="t-status"><option>new</option><option>used</option><option>rejected</option></select></label></div>
+      <div id="topics"></div>
+    </div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section id="tab-library" class="tab">
+    <div class="card">
+      <h2>Footage &amp; music library</h2>
+      <p class="muted">Clips and images are matched to script beats by their tags when the "library" share in Settings › Visual mix is above 0. Music is picked at random when music is on.</p>
+      <div class="row wrap">
+        <input type="file" id="l-file" multiple accept="video/*,image/*,audio/*">
+        <input id="l-tags" placeholder="tags, e.g. prison cell night rain">
+        <button id="l-add" class="primary">Upload</button>
+      </div>
+      <div id="library" class="libgrid"></div>
+    </div>
+  </section>
+
+  <!-- FORMATS -->
+  <section id="tab-formats" class="tab">
+    <div class="card">
+      <h2>Formats</h2>
+      <p class="muted">A format is a recipe: structure, tone and art style. Add one whenever a new trend shows up. No code needed.</p>
+      <div class="row"><label>Edit <select id="f-pick"></select></label><button id="f-new">New format</button></div>
+      <div id="f-form"></div>
+      <div class="actions"><button class="primary" id="f-save">Save format</button></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="tab">
+    <div class="card">
+      <h2>Presets</h2>
+      <p class="muted">Base settings below apply to everything. A preset overrides some of them per video. Save the fields you've changed as your own preset.</p>
+      <div class="row wrap">
+        <select id="p-pick"></select>
+        <button id="p-load">Show overrides</button>
+        <input id="p-name" placeholder="new preset name">
+        <button id="p-save">Save current form as preset</button>
+        <button id="p-del">Delete</button>
+      </div>
+      <pre id="p-view" class="muted"></pre>
+    </div>
+    <div id="settings-form"></div>
+    <div class="savebar"><button class="primary" id="s-save">Save settings</button><span id="s-msg" class="muted"></span></div>
+  </section>
+</main>
+
+<dialog id="job-dialog"><div id="job-body"></div></dialog>
+<script src="/static/app.js"></script>
+</body>
+</html>

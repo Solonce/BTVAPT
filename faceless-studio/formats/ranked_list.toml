@@ -1,0 +1,17 @@
+label = "Ranked list (movies)"
+description = "Countdown of movies/shows with punchy commentary; uses clips from your media server when enabled."
+examples = [
+  "Worst apocalypse movies ranked",
+  "Movies where the villain was actually right",
+  "Survival movies that would kill you in real life",
+]
+structure = """
+Countdown from the lowest rank to number one. For each entry: name it with its
+year in the first sentence, then one or two sentences of savage or hilarious
+commentary on why it's on the list. Each entry's beats must set movie_title and
+movie_year. Open with a hook teasing number one. End with a comment bait line.
+"""
+tone = "Opinionated, roast-y, confident. Short sentences."
+visual_style = "dramatic movie poster style, cinematic, high contrast"
+recurring_character = false
+uses_movies = true

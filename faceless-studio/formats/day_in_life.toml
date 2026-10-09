@@ -1,0 +1,16 @@
+label = "Day in the life (history)"
+description = "A brutal or bizarre day in the life of someone from history, in second person."
+examples = [
+  "A day in the life of a medieval plague doctor",
+  "Your first day as a Roman gladiator",
+  "24 hours on a 1700s pirate ship",
+]
+structure = """
+Second person, present tense, sunrise to night. Each beat is a moment of the
+day with one striking, historically flavoured detail (food, punishment,
+hygiene, danger). Escalate toward a dramatic event in the evening. End on a
+grim or funny twist.
+"""
+tone = "Immersive, gritty, wry."
+visual_style = "painterly cinematic historical illustration, moody lighting, film grain"
+recurring_character = true
