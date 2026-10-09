@@ -191,3 +191,13 @@ def test_featherless_writer_repairs_messy_json(monkeypatch):
 def test_claude_schema_has_no_defaults():
     from studio import scriptgen
     assert '"default"' not in json.dumps(llm._strip_defaults(scriptgen.SCHEMA))
+
+
+def test_overlong_script_gets_one_trim_pass(monkeypatch):
+    from studio import scriptgen
+    long = _script([_beat("word " * 60) for _ in range(5)])
+    short = _script([_beat("short line here.") for _ in range(4)])
+    calls = []
+    monkeypatch.setattr(llm, "structured", lambda *a, **k: calls.append(1) or (long if len(calls) == 1 else short))
+    out = scriptgen.write(settings.Settings(target_seconds=30), "timeline_story", "x")
+    assert len(calls) == 2 and len(out["beats"]) == 4 and out["format"] == "timeline_story"

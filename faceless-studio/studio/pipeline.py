@@ -179,15 +179,25 @@ def step_footage(job: Job, script: dict, times: list[tuple[float, float]]) -> li
 
     first = [(i, 0, times[i][1] - times[i][0]) for i in range(len(beats))]
     total = len(first)
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=3) as pool:
         list(pool.map(lambda a: get(*a), first))
+
+    # Second chance, one at a time, for beats that fell back to a plain card
+    for i, dur in [(i, d) for i, _, d in first if assets[(i, 0)].source == "card"]:
+        req = Request(beat=beats[i], index=i, duration=dur, script=script, workdir=job.dir,
+                      job_id=job.id, source_video=job.source_video)
+        try:
+            assets[(i, 0)] = fetch_asset(job, req, [k for k in plan[i] if k != "card"], budget_left)
+            job.log(f"Beat {i + 1}: footage recovered on retry")
+        except Exception:
+            pass
 
     # Extra shots: alternate stills for image beats, other moments for clips
     extras = [(sh["beat"], sh["sub"], sh["duration"]) for sh in shots
               if sh["sub"] > 0 and assets[(sh["beat"], 0)].type == "image"
               and assets[(sh["beat"], 0)].source != "card"]
     total += len(extras)
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    with ThreadPoolExecutor(max_workers=3) as pool:
         list(pool.map(lambda a: get(*a), extras))
 
     motions = render.pick_motions(len(shots), job.id)

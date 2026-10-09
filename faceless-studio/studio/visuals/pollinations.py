@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+import time
 import urllib.parse
 
 from .. import net
@@ -26,11 +27,13 @@ class Pollinations:
         url = (f"https://image.pollinations.ai/prompt/{q}?width=1280&height=1280&nologo=true"
                f"&model=flux&seed={seed}")
         last = None
-        for _ in range(3):
+        for attempt in range(5):
             try:
                 net.download(url, dest, timeout=180)
                 return Asset(dest, "image", source=self.name)
-            except Exception as e:  # flaky free service; retry with a new seed
+            except Exception as e:  # the free service throws intermittent 5xx under load
                 last = e
-                url = url.rsplit("&seed=", 1)[0] + f"&seed={random.randint(1, 10**9)}"
+                time.sleep(4 * (attempt + 1))
+                if attempt >= 1:
+                    url = url.rsplit("&seed=", 1)[0] + f"&seed={random.randint(1, 10**9)}"
         raise RuntimeError(f"pollinations failed: {last}")

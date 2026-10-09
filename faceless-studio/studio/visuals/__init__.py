@@ -38,7 +38,7 @@ class Request:
         style = self.script.get("style", "")
         p = self.beat["image_prompt"]
         if self.variant:
-            p += ", different camera angle, close-up detail shot"
+            p += ", alternate composition from a different camera angle"
         return f"{p}. Style: {style}. No text, no watermark." if style else p
 
 

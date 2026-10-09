@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import base64
+import json
 from pathlib import Path
 
 from . import formats, llm
@@ -40,13 +41,19 @@ Narration rules:
 - Never say "in this video", "let's dive in", "subscribe" or similar.
 
 Visual rules (each beat gets exactly one visual):
-- image_prompt: a self-contained prompt for an image generator describing exactly what the
-  narrator is talking about in that beat: subject, action, setting, camera angle, lighting,
-  emotion. Keep the main subject centred (it will be cropped to both 9:16 and 16:9).
-  Never ask for text, captions or logos in the image. Always fill this in, even for other
-  kinds, because it is the fallback.
-- If there is a recurring protagonist, describe them once in `character` (age, build, hair,
-  clothing) and paste that description into every image_prompt they appear in.
+- image_prompt: a self-contained prompt for an image generator that SHOWS exactly what the
+  narrator is saying in that beat. Lead with the concrete subject or action the line is
+  about (the knife, the grave, the trophies, the footprints), then setting, then shot type
+  and lighting. If the line mentions an object or event, the object/event is the subject,
+  not someone's face. Keep the main subject centred (it will be cropped to 9:16 and 16:9).
+  Never ask for text, captions or logos. Always fill this in, even for other kinds,
+  because it is the fallback.
+- Vary the shots like an editor: wide establishing shots, medium action shots, extreme
+  close-ups of objects and details, point-of-view shots, over-the-shoulder. At most a third
+  of beats may be a close-up of a face.
+- If there is a recurring protagonist, define them in `character`, and when they appear
+  in a shot add a SHORT tag at the end of the prompt (5-10 words, e.g. "young woman with a
+  black bob and torn tank top"). Leave them out of shots where they aren't the subject.
 - `style` is the art direction shared by all images.
 - stock_query: 2-4 word stock-footage search for the beat (always fill in).
 - kind: "auto" unless a specific source is clearly best. Allowed specific kinds: {kinds}.
@@ -91,7 +98,7 @@ Format: {fmt['label']} - {fmt.get('description', '')}
 Structure:
 {fmt['structure'].strip()}
 Tone: {fmt['tone']}
-Length: about {words} words of narration across about {beats} beats (~{s.target_seconds}s spoken).
+Length: {words} words of narration in total (hard limit), across about {beats} beats (~{s.target_seconds}s spoken).
 Default art style (refine it, keep it consistent): {s.visual_style or fmt['visual_style']}
 Recurring protagonist: {'yes' if fmt.get('recurring_character') else 'only if it helps'}
 {s.extra_script_notes}
@@ -109,5 +116,30 @@ hashtags without '#', and 2-5 words of punchy thumbnail_text."""
     script["beats"] = [b for b in script["beats"] if b["narration"].strip()]
     if not script["beats"]:
         raise llm.LLMError("script came back with no narration")
+    script = _fit_length(s, script, words, job_id)
     script["format"] = fmt_name
+    return script
+
+
+def _count(script: dict) -> int:
+    return sum(len(b["narration"].split()) for b in script["beats"])
+
+
+def _fit_length(s: Settings, script: dict, words: int, job_id: int | None) -> dict:
+    """One tightening pass when the writer overshoots the target length (common with open models)."""
+    have = _count(script)
+    if have <= words * 1.25:
+        return script
+    prompt = (f"This script has {have} words of narration; the limit is {words}. Rewrite it to at most "
+              f"{words} words: cut or merge the weakest beats, keep the hook, the escalation and the "
+              f"ending, and keep every field of each beat you keep. Return the whole script.\n\n"
+              + json.dumps(script))
+    try:
+        shorter = llm.structured(s, SYSTEM.format(kinds="ai_image"), prompt, SCHEMA, job_id=job_id, what="script trim")
+    except llm.LLMError:
+        return script
+    shorter["beats"] = [b for b in shorter["beats"] if b["narration"].strip()]
+    if shorter["beats"] and _count(shorter) < have:
+        shorter["format"] = script["format"]
+        return shorter
     return script
