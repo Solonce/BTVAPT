@@ -31,10 +31,14 @@ const GROUPS = [
     ["output_dir", "str", "Finished videos land here (relative to the app folder or absolute)"],
     ["format_weights", "weights:formats", "How often autopilot picks each format (0 = never)"],
   ]],
-  ["Writing (Claude)", [
-    ["llm_model", ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5", "claude-fable-5-1"], "Script & topic model"],
-    ["llm_effort", ["low", "medium", "high", "xhigh", "max"], "Thinking effort"],
-    ["trend_research", "bool", "Search the web for trending faceless videos when refilling topics"],
+  ["Writing", [
+    ["llm_provider", ["claude", "featherless"], "Who writes topics & scripts. Featherless = flat-rate open models (no web trend research)"],
+    ["featherless_model", "str", "Featherless model id, e.g. deepseek-ai/DeepSeek-V3-0324, moonshotai/Kimi-K2-Instruct-0905, zai-org/GLM-4.7, Qwen/Qwen3-14B (smaller plans)"],
+    ["featherless_vision_model", "str", "Featherless model that can see images (Narrate my footage), e.g. Qwen/Qwen3-VL-30B-A3B-Instruct"],
+    ["featherless_base_url", "str", "Any OpenAI-compatible endpoint works here"],
+    ["llm_model", ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5", "claude-fable-5-1"], "Claude model (when the writer is claude)"],
+    ["llm_effort", ["low", "medium", "high", "xhigh", "max"], "Claude thinking effort"],
+    ["trend_research", "bool", "Claude only: search the web for trending faceless videos when refilling topics"],
     ["extra_script_notes", "text", "Standing direction added to every script"],
   ]],
   ["Voice", [
@@ -80,7 +84,8 @@ const GROUPS = [
     ["per_video_max_usd", "float", "Paid sources are skipped beyond this per video"],
   ]],
   ["API keys", [
-    ["anthropic_api_key", "secret", "Claude (required)"],
+    ["anthropic_api_key", "secret", "Claude (needed when the writer is claude)"],
+    ["featherless_api_key", "secret", "Featherless (needed when the writer is featherless)"],
     ["elevenlabs_api_key", "secret", "Optional: premium voices"],
     ["fal_key", "secret", "Optional: Flux images + AI video"],
     ["pexels_api_key", "secret", "Optional, free: stock footage"],
@@ -162,7 +167,7 @@ async function refreshStatus() {
     const s = await api("/api/status");
     const p = s.providers;
     const warn = [];
-    if (!p.claude) warn.push("set your Claude API key in Settings");
+    if (!p.writer) warn.push(`set your ${p.writer_name} API key in Settings`);
     if (s.missing_binaries.length) warn.push("missing " + s.missing_binaries.join(", "));
     $("#statusbar").innerHTML =
       `<span>Spend <b>$${s.month_spend.toFixed(2)}</b> / $${s.monthly_budget}</span>` +

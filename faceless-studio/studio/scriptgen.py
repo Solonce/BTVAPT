@@ -17,7 +17,7 @@ BEAT = llm.obj({
     "stock_query": {"type": "string"},
     "movie_title": {"type": "string"},
     "movie_year": {"type": "integer"},
-    "source_start": {"type": "number"},
+    "source_start": {"type": "number", "default": -1},
     "emphasis": {"type": "boolean"},
 })
 SCHEMA = llm.obj({

@@ -59,6 +59,19 @@ Open `http://<box-name>:8765` from any device on your tailnet, go to
 > The Anthropic **API** key comes from console.anthropic.com and is billed
 > separately from a Claude.ai subscription.
 
+### Using Featherless instead of Claude
+
+Settings → Writing → `llm_provider = featherless`, then paste the key under
+API keys. Defaults: `deepseek-ai/DeepSeek-V3-0324` for topics/scripts and
+`Qwen/Qwen3-VL-30B-A3B-Instruct` for "Narrate my footage" (needs a model that
+can see images). Other good writers: `moonshotai/Kimi-K2-Instruct-0905`,
+`zai-org/GLM-4.7`. On smaller Featherless plans that can't run big models, use
+e.g. `Qwen/Qwen3-14B`. It's a flat subscription, so spend shows $0 for writing.
+Trade-offs vs Claude: no hosted web search (add a free YouTube API key so
+topic refills still see trending titles), and JSON is enforced by prompt plus
+a repair retry rather than guaranteed. `featherless_base_url` accepts any
+OpenAI-compatible endpoint (OpenRouter, a local vLLM/Ollama server, etc.).
+
 ## Media server
 
 Settings → Media server: set the base URL (e.g. `http://vidsrc.xyz`, which your
@@ -76,6 +89,7 @@ give the "Ranked list (movies)" format a weight to use it.
 |---|---|
 | Free preset (Sonnet script, free voice + images) | ~$0.04–0.10 |
 | Default (Opus script, free voice + images) | ~$0.10–0.25 |
+| Featherless writer, free voice + images | $0 beyond your Featherless plan |
 | Premium (ElevenLabs, Flux, 4 AI video clips) | ~$1.50–2.50 + ElevenLabs plan |
 
 Topic refills with web research add about $0.05–0.15 per batch of 12. These

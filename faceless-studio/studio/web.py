@@ -45,7 +45,8 @@ def status() -> dict:
         "month_spend": round(db.month_spend(), 4), "monthly_budget": s.monthly_budget_usd,
         "missing_binaries": media.check(),
         "providers": {
-            "claude": has("anthropic_api_key"),
+            "writer": has("featherless_api_key") if s.llm_provider == "featherless" else has("anthropic_api_key"),
+            "writer_name": "Featherless" if s.llm_provider == "featherless" else "Claude",
             "elevenlabs": has("elevenlabs_api_key"), "fal": has("fal_key"),
             "pexels": has("pexels_api_key"), "youtube": has("youtube_api_key"), "tmdb": has("tmdb_api_key"),
             "mediaserver": s.mediaserver_enabled,

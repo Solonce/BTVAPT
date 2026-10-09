@@ -21,7 +21,7 @@ SETTINGS_FILE = DATA / "settings.json"
 PRESETS_FILE = DATA / "presets.json"
 
 SECRET_FIELDS = {
-    "anthropic_api_key", "elevenlabs_api_key", "fal_key",
+    "anthropic_api_key", "featherless_api_key", "elevenlabs_api_key", "fal_key",
     "pexels_api_key", "youtube_api_key", "tmdb_api_key",
 }
 
@@ -36,7 +36,11 @@ class Settings(BaseModel):
     target_seconds: int = 120
     format_weights: dict[str, float] = Field(default_factory=lambda: {"timeline_story": 1.0})
 
-    # Writing (Claude)
+    # Writing
+    llm_provider: str = "claude"       # claude | featherless (any OpenAI-compatible API)
+    featherless_model: str = "deepseek-ai/DeepSeek-V3-0324"
+    featherless_vision_model: str = "Qwen/Qwen3-VL-30B-A3B-Instruct"   # used when frames are attached
+    featherless_base_url: str = "https://api.featherless.ai/v1"
     llm_model: str = "claude-opus-5-5"
     llm_effort: str = "medium"
     trend_research: bool = True        # let Claude web-search for trending faceless videos when refilling topics
@@ -92,6 +96,7 @@ class Settings(BaseModel):
 
     # Credentials (env vars with the upper-case name win)
     anthropic_api_key: str = ""
+    featherless_api_key: str = ""
     elevenlabs_api_key: str = ""
     fal_key: str = ""
     pexels_api_key: str = ""

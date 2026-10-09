@@ -143,3 +143,51 @@ def test_mediaserver_follows_iframe_to_stream(tmp_path):
         assert asset.type == "video" and asset.duration >= 3.0
     finally:
         srv.shutdown()
+
+
+def test_featherless_writer_repairs_messy_json(monkeypatch):
+    replies = [
+        "Sure! Here you go: {not json",
+        "<think>plan the script</think>\n```json\n" + json.dumps({
+            "title": "T", "description": "d", "hashtags": "#jail, #story", "thumbnail_text": "WOW",
+            "character": "", "style": "s",
+            "beats": [{"narration": "Hour one.", "kind": "weird", "image_prompt": "cell", "movie_year": "1999"}],
+        }) + "\n```",
+    ]
+    seen = []
+
+    class H(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            seen.append((self.path, self.headers["Authorization"], body))
+            out = json.dumps({"choices": [{"message": {"content": replies[len(seen) - 1]}}]}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(out)))
+            self.end_headers()
+            self.wfile.write(out)
+
+        def log_message(self, *a):
+            pass
+
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        from studio import scriptgen
+        s = settings.Settings(llm_provider="featherless", featherless_api_key="k",
+                              featherless_base_url=f"http://127.0.0.1:{srv.server_port}/v1")
+        script = scriptgen.write(s, "timeline_story", "Your last 48 hours in jail")
+    finally:
+        srv.shutdown()
+    assert len(seen) == 2  # one repair round-trip
+    path, auth, body = seen[0]
+    assert path == "/v1/chat/completions" and auth == "Bearer k"
+    assert body["model"] == "deepseek-ai/DeepSeek-V3-0324"
+    b = script["beats"][0]
+    assert script["hashtags"] == ["jail", "story"]
+    assert b["kind"] == "auto" and b["movie_year"] == 1999 and b["stock_query"] == "" and b["source_start"] == -1
+
+
+def test_claude_schema_has_no_defaults():
+    from studio import scriptgen
+    assert '"default"' not in json.dumps(llm._strip_defaults(scriptgen.SCHEMA))

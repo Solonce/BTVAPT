@@ -69,6 +69,12 @@ def _check(resp: Any) -> None:
 def structured(s: Settings, system: str, content: Any, schema: dict, *,
                job_id: int | None = None, what: str = "") -> dict:
     """One call that returns JSON matching `schema`."""
+    if s.llm_provider == "featherless":
+        from . import openai_compat
+        try:
+            return openai_compat.structured(s, system, content, schema)
+        except openai_compat.CompatError as e:
+            raise LLMError(str(e)) from e
     client = _client(s)
     with client.messages.stream(
         max_tokens=32000,
@@ -76,7 +82,7 @@ def structured(s: Settings, system: str, content: Any, schema: dict, *,
         messages=[{"role": "user", "content": content}],
         **{**_request_kwargs(s), "output_config": {
             "effort": s.llm_effort,
-            "format": {"type": "json_schema", "schema": schema},
+            "format": {"type": "json_schema", "schema": _strip_defaults(schema)},
         }},
     ) as stream:
         resp = stream.get_final_message()
@@ -92,6 +98,8 @@ def structured(s: Settings, system: str, content: Any, schema: dict, *,
 def research(s: Settings, system: str, prompt: str, *, max_searches: int = 5,
              job_id: int | None = None, what: str = "research") -> str:
     """Free-text answer with Claude's web search tool available."""
+    if s.llm_provider != "claude":
+        return ""  # no hosted web search on other providers; YouTube API titles still feed refills
     client = _client(s)
     messages: list[dict] = [{"role": "user", "content": prompt}]
     tools = [{"type": "web_search_20260209", "name": "web_search", "max_uses": max_searches}]
@@ -105,6 +113,15 @@ def research(s: Settings, system: str, prompt: str, *, max_searches: int = 5,
             return "".join(b.text for b in resp.content if b.type == "text")
         messages.append({"role": "assistant", "content": resp.content})
     return ""
+
+
+def _strip_defaults(schema: Any) -> Any:
+    """`default` is only a hint for lenient providers; keep it out of Claude's strict schema."""
+    if isinstance(schema, dict):
+        return {k: _strip_defaults(v) for k, v in schema.items() if k != "default"}
+    if isinstance(schema, list):
+        return [_strip_defaults(v) for v in schema]
+    return schema
 
 
 def obj(props: dict[str, Any]) -> dict:
