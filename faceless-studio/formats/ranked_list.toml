@@ -11,7 +11,7 @@ year in the first sentence, then one or two sentences of savage or hilarious
 commentary on why it's on the list. Each entry's beats must set movie_title and
 movie_year. Open with a hook teasing number one. End with a comment bait line.
 """
-tone = "Opinionated, roast-y, confident. Short sentences."
+tone = "Opinionated, roast-y, confident, flowing from one entry to the next."
 visual_style = "dramatic movie poster style, cinematic, high contrast"
 recurring_character = false
 uses_movies = true

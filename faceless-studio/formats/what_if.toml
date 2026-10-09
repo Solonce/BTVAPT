@@ -11,6 +11,6 @@ in escalating stages, each one bigger than the last, mixing real-sounding facts
 with vivid sensory detail. Second person where it fits. End with the final,
 most absurd consequence.
 """
-tone = "Curious, dramatic, a little unhinged. Short sentences."
+tone = "Curious, dramatic, a little unhinged, told as one escalating story."
 visual_style = "hyper-detailed digital illustration, cinematic composition, dramatic scale, volumetric light"
 recurring_character = false

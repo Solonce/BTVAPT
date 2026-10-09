@@ -26,6 +26,19 @@ SECRET_FIELDS = {
 }
 
 
+ART_STYLES = {
+    "cartoon": "2D cartoon illustration, bold clean outlines, flat vibrant colors, cel shading, "
+               "expressive exaggerated characters, modern animated explainer style",
+    "comic": "graphic novel comic book art, heavy black ink lines, halftone shading, dramatic "
+             "angles, muted palette with red accents",
+    "anime": "anime illustration, clean line art, dramatic lighting, detailed painted backgrounds, "
+             "anime film still",
+    "3d_cartoon": "stylized 3D cartoon render, Pixar-style characters, soft lighting, vibrant colors",
+    "storybook": "dark storybook illustration, ink and watercolor on textured paper, moody",
+    "cinematic": "cinematic film still, dramatic lighting, realistic, high detail",
+}
+
+
 class Settings(BaseModel):
     # Output
     output_dir: str = "output"
@@ -48,13 +61,14 @@ class Settings(BaseModel):
 
     # Voice
     tts_provider: str = "edge"         # edge (free) | elevenlabs
-    edge_voice: str = "en-US-ChristopherNeural"
-    edge_rate: str = "+8%"
+    edge_voice: str = "en-US-AndrewMultilingualNeural"
+    edge_rate: str = "+5%"
+    max_pause: float = 0.3             # longest silence kept between words (0 = leave as is)
     elevenlabs_voice_id: str = "pNInz6obpgDQGcFmaJgB"
     elevenlabs_model: str = "eleven_multilingual_v2"
 
     # Visuals
-    image_provider: str = "pollinations"   # pollinations (free) | fal
+    image_provider: str = "auto"           # auto (fal if key, else free) | pollinations | fal
     fal_image_model: str = "fal-ai/flux/schnell"
     video_provider: str = "none"           # none | fal
     fal_video_model: str = "fal-ai/kling-video/v2.1/standard/image-to-video"
@@ -64,7 +78,8 @@ class Settings(BaseModel):
     visual_mix: dict[str, float] = Field(default_factory=lambda: {
         "ai_image": 1.0, "stock": 0.0, "library": 0.0,
     })
-    visual_style: str = ""             # overrides the format's style when set
+    art_style: str = "anime"           # one of ART_STYLES, or "format" to use each format's own style
+    visual_style: str = ""             # free-text style; overrides art_style when set
     motion_intensity: float = 1.0      # 0 = static, 1 = normal, 2 = aggressive
     max_shot_seconds: float = 4.0      # longer beats get split into several shots
 
@@ -105,6 +120,11 @@ class Settings(BaseModel):
 
     def secret(self, name: str) -> str:
         return os.environ.get(name.upper(), "") or getattr(self, name)
+
+    def style_for(self, fmt: dict) -> str:
+        if self.visual_style.strip():
+            return self.visual_style.strip()
+        return ART_STYLES.get(self.art_style) or fmt.get("visual_style", "") or ART_STYLES["cartoon"]
 
     def output_path(self) -> Path:
         p = Path(self.output_dir)
@@ -150,8 +170,11 @@ def save(values: dict[str, Any]) -> Settings:
             if k in current:
                 current[k] = v
         s = Settings(**current)
+        # Store only what differs from the defaults, so improved defaults reach existing installs
+        defaults = Settings().model_dump()
+        changed = {k: v for k, v in s.model_dump().items() if v != defaults[k]}
         DATA.mkdir(parents=True, exist_ok=True)
-        SETTINGS_FILE.write_text(json.dumps(s.model_dump(), indent=2))
+        SETTINGS_FILE.write_text(json.dumps(changed, indent=2))
         return s
 
 

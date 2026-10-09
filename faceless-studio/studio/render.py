@@ -60,9 +60,9 @@ def _motion_filter(motion: str, frames: int, w: int, h: int, fps: int, intensity
     else:  # pan_up
         z, x, y = f"{pan_zoom:.3f}", cx, f"(ih-ih/zoom)*(1-{e})"
     up_w, up_h = w * 3, h * 3   # oversample so slow motion doesn't jitter
-    return (f"scale={up_w}:{up_h}:force_original_aspect_ratio=increase,crop={up_w}:{up_h},"
+    return (f"scale={up_w}:{up_h}:force_original_aspect_ratio=increase:flags=lanczos,crop={up_w}:{up_h},"
             f"zoompan=z='{z}':x='{x}':y='{y}':d={frames}:s={w}x{h}:fps={fps},"
-            f"setsar=1,format=yuv420p")
+            f"unsharp=5:5:0.6:5:5:0,setsar=1,format=yuv420p")
 
 
 ENC = ["-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-pix_fmt", "yuv420p"]

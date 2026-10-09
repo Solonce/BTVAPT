@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 from pathlib import Path
 
 from . import formats, llm
 from .settings import Settings
+
+log = logging.getLogger(__name__)
 
 WORDS_PER_SECOND = 2.6
 KINDS = ["auto", "ai_image", "ai_video", "stock", "movie", "source"]
@@ -35,8 +38,17 @@ SYSTEM = """You are the head writer of a viral faceless video channel. Your scri
 by an AI narrator over fast-cut visuals, so they live or die on retention.
 
 Narration rules:
+- It must sound like one continuous story told by a gripping storyteller, not a list of
+  captions. Use flowing sentences that carry momentum from one moment into the next with
+  connecting words (and, but, so, until, which is when, by the time...). Avoid stacks of
+  two- or three-word fragments; a rare punchy fragment for impact is fine.
 - Plain spoken words only: no stage directions, emojis, hashtags or speaker labels.
-- One beat = one short sentence or two very short ones (about 2-4 seconds spoken).
+- Beats are for the editor, not the narrator: a beat is the stretch of narration one image
+  covers (about 2-4 seconds, roughly 6-12 words). Split long sentences across several beats
+  at natural phrase breaks, so a beat can end mid-sentence (on a comma or a conjunction)
+  and the next beat continues it.
+- Time stamps like "Hour 6" should be woven into sentences ("By hour six, ..."), not read
+  as standalone labels.
 - The first beat is the hook and must make scrolling away feel impossible.
 - Never say "in this video", "let's dive in", "subscribe" or similar.
 
@@ -54,7 +66,8 @@ Visual rules (each beat gets exactly one visual):
 - If there is a recurring protagonist, define them in `character`, and when they appear
   in a shot add a SHORT tag at the end of the prompt (5-10 words, e.g. "young woman with a
   black bob and torn tank top"). Leave them out of shots where they aren't the subject.
-- `style` is the art direction shared by all images.
+- The art style is fixed and added to every prompt automatically: do NOT put art-style or
+  medium words (photorealistic, 3D render, cinematic, illustration, anime...) in image_prompt.
 - stock_query: 2-4 word stock-footage search for the beat (always fill in).
 - kind: "auto" unless a specific source is clearly best. Allowed specific kinds: {kinds}.
 - emphasis: true for the few most dramatic beats (they get premium treatment).
@@ -78,6 +91,7 @@ def write(s: Settings, fmt_name: str, topic: str, angle: str = "", *, job_id: in
           frames: list[tuple[float, Path]] | None = None, source_duration: float | None = None) -> dict:
     fmt = formats.get(fmt_name)
     words = int(s.target_seconds * WORDS_PER_SECOND)
+    style = s.style_for(fmt)
     beats = max(6, round(s.target_seconds / 3.2))
 
     kinds = ["ai_image"]
@@ -99,7 +113,7 @@ Structure:
 {fmt['structure'].strip()}
 Tone: {fmt['tone']}
 Length: {words} words of narration in total (hard limit), across about {beats} beats (~{s.target_seconds}s spoken).
-Default art style (refine it, keep it consistent): {s.visual_style or fmt['visual_style']}
+Art style of the images (applied automatically; just describe scenes that suit it): {style}
 Recurring protagonist: {'yes' if fmt.get('recurring_character') else 'only if it helps'}
 {s.extra_script_notes}
 
@@ -116,7 +130,9 @@ hashtags without '#', and 2-5 words of punchy thumbnail_text."""
     script["beats"] = [b for b in script["beats"] if b["narration"].strip()]
     if not script["beats"]:
         raise llm.LLMError("script came back with no narration")
-    script = _fit_length(s, script, words, job_id)
+    if not frames:  # a revision can't see the user's footage, so leave those scripts alone
+        script = _fit_length(s, script, words, job_id)
+    script["style"] = style
     script["format"] = fmt_name
     return script
 
@@ -126,20 +142,28 @@ def _count(script: dict) -> int:
 
 
 def _fit_length(s: Settings, script: dict, words: int, job_id: int | None) -> dict:
-    """One tightening pass when the writer overshoots the target length (common with open models)."""
-    have = _count(script)
-    if have <= words * 1.25:
+    """One revision pass when the writer misses the length or writes too few, too-long beats
+    (common with open models). Each beat is one image, so beat count is pacing."""
+    target_beats = max(6, round(words / 9))
+    have, n = _count(script), len(script["beats"])
+    if words * 0.75 <= have <= words * 1.25 and n >= target_beats * 0.6:
         return script
-    prompt = (f"This script has {have} words of narration; the limit is {words}. Rewrite it to at most "
-              f"{words} words: cut or merge the weakest beats, keep the hook, the escalation and the "
-              f"ending, and keep every field of each beat you keep. Return the whole script.\n\n"
-              + json.dumps(script))
+    prompt = (f"Revise this script. It has {have} words in {n} beats. Requirements:\n"
+              f"- Total narration between {int(words * 0.85)} and {words} words (count carefully); keep "
+              f"the hook, the escalation and the ending, and keep the narration flowing.\n"
+              f"- About {target_beats} beats of 6-12 words each: split long sentences across several "
+              f"beats at natural phrase breaks (a beat may end mid-sentence on a comma).\n"
+              f"- Every beat's image_prompt must show exactly what that beat's words describe.\n"
+              f"Return the whole script with all fields.\n\n" + json.dumps(script))
     try:
-        shorter = llm.structured(s, SYSTEM.format(kinds="ai_image"), prompt, SCHEMA, job_id=job_id, what="script trim")
-    except llm.LLMError:
+        fixed = llm.structured(s, SYSTEM.format(kinds="ai_image"), prompt, SCHEMA, job_id=job_id,
+                               what="script revision")
+    except llm.LLMError as e:
+        log.warning("script revision failed: %s", e)
         return script
-    shorter["beats"] = [b for b in shorter["beats"] if b["narration"].strip()]
-    if shorter["beats"] and _count(shorter) < have:
-        shorter["format"] = script["format"]
-        return shorter
-    return script
+    fixed["beats"] = [b for b in fixed["beats"] if b["narration"].strip()]
+
+    def miss(sc: dict) -> float:
+        return abs(_count(sc) - words * 0.92) / words + max(0, target_beats - len(sc["beats"])) / target_beats
+
+    return fixed if fixed["beats"] and miss(fixed) < miss(script) else script

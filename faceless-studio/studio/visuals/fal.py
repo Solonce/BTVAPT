@@ -10,7 +10,7 @@ import time
 from .. import db, media, net
 from . import Asset, Request
 
-IMAGE_USD = 0.004
+IMAGE_USD = 0.008
 VIDEO_USD = 0.35
 
 
@@ -39,14 +39,14 @@ class FalImage:
     paid = True
 
     def available(self, s, req) -> bool:
-        return s.image_provider == "fal" and bool(s.secret("fal_key"))
+        return s.image_provider in ("fal", "auto") and bool(s.secret("fal_key"))
 
     def estimate(self, s, req) -> float:
         return IMAGE_USD
 
     def fetch(self, s, req: Request) -> Asset:
         out = _run(s.secret("fal_key"), s.fal_image_model, {
-            "prompt": req.prompt(), "image_size": {"width": 1280, "height": 1280}, "num_images": 1,
+            "prompt": req.prompt(), "image_size": {"width": 1536, "height": 1536}, "num_images": 1,
         })
         dest = req.workdir / f"beat{req.index:03d}_v{req.variant}_fal.jpg"
         net.download(out["images"][0]["url"], dest)

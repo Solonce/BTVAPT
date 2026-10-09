@@ -39,7 +39,8 @@ class Request:
         p = self.beat["image_prompt"]
         if self.variant:
             p += ", alternate composition from a different camera angle"
-        return f"{p}. Style: {style}. No text, no watermark." if style else p
+        # Style first: image models weight the start of the prompt most
+        return f"{style}. {p}. No text, no watermark." if style else p
 
 
 class Source(Protocol):

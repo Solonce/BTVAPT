@@ -9,10 +9,10 @@ examples = [
 structure = """
 Second person ("you"), present tense. Open with a one-line hook that drops the
 viewer into the most intense moment, then rewind to the start of the timeline.
-Move forward with explicit time stamps ("Hour 3.", "Day 12.") that escalate.
+Move forward through time stamps woven into the sentences ("By hour three...", "On day twelve...") that escalate.
 Every 2-3 beats add a twist, a gross/shocking detail, or a stakes jump.
 End on a cliffhanger, a dark punchline, or a question that invites comments.
 """
-tone = "Tense, punchy, darkly funny. Short sentences. No filler, no 'in this video'."
+tone = "Tense, darkly funny, propulsive storytelling that flows from moment to moment. No filler."
 visual_style = "cinematic 3D animated render, dramatic rim lighting, expressive faces, rich color, high detail, film still"
 recurring_character = true

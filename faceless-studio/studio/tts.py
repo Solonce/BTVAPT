@@ -99,14 +99,48 @@ def _even(text: str, duration: float) -> list[dict]:
     return words
 
 
+def tighten(path: Path, words: list[dict], max_gap: float) -> list[dict]:
+    """Shorten silences between words to at most `max_gap` seconds, shifting word timings.
+
+    Cuts land in the middle of silence, so speech is untouched; this removes the
+    dead air TTS engines leave after every full stop.
+    """
+    if max_gap <= 0 or len(words) < 2:
+        return words
+    cuts = []
+    for a, b in zip(words, words[1:]):
+        if b["start"] - a["end"] > max_gap:
+            cuts.append((a["end"] + max_gap / 2, b["start"] - max_gap / 2))
+    if not cuts:
+        return words
+    total = media.duration(path)
+    keep, t = [], 0.0
+    for cs, ce in cuts:
+        keep.append((t, cs))
+        t = ce
+    keep.append((t, total))
+    parts = "".join(f"[0:a]atrim={a:.3f}:{b:.3f},asetpts=PTS-STARTPTS[k{i}];" for i, (a, b) in enumerate(keep))
+    graph = parts + "".join(f"[k{i}]" for i in range(len(keep))) + f"concat=n={len(keep)}:v=0:a=1[o]"
+    tmp = path.with_name(path.stem + "_tight" + path.suffix)
+    media.run(["-i", str(path), "-filter_complex", graph, "-map", "[o]", "-c:a", "libmp3lame", "-q:a", "2", str(tmp)])
+    tmp.replace(path)
+    out = []
+    for w in words:
+        shift = sum(ce - cs for cs, ce in cuts if ce <= w["start"] + 1e-6)
+        out.append({**w, "start": w["start"] - shift, "end": w["end"] - shift})
+    return out
+
+
 def synthesize(s: Settings, text: str, out: Path, job_id: int | None = None) -> tuple[list[dict], float]:
     if s.tts_provider == "elevenlabs":
         words = _elevenlabs(s, text, out, job_id)
     else:
         words = _locate(asyncio.run(_edge(s, text, out)), text)
+    # Strip punctuation-only tokens some engines emit
+    words = [w for w in words if re.search(r"\w", w["text"])]
+    if words:
+        words = tighten(out, words, s.max_pause)
     duration = media.duration(out)
     if not words:
         words = _even(text, duration)
-    # Strip punctuation-only tokens some engines emit
-    words = [w for w in words if re.search(r"\w", w["text"])]
     return words, duration

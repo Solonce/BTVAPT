@@ -99,7 +99,8 @@ def test_footage_narration_uses_source(offline, monkeypatch, tmp_path):
     seen = {}
 
     def fake(s, system, content, schema, **kw):
-        seen["images"] = sum(1 for c in content if isinstance(c, dict) and c.get("type") == "image")
+        if isinstance(content, list):
+            seen["images"] = sum(1 for c in content if isinstance(c, dict) and c.get("type") == "image")
         return _script([_beat("First thing.", kind="source", source_start=1.0),
                         _beat("Then this happens.", kind="source", source_start=6.0)])
     monkeypatch.setattr(llm, "structured", fake)
@@ -174,6 +175,7 @@ def test_featherless_writer_repairs_messy_json(monkeypatch):
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     try:
         from studio import scriptgen
+        monkeypatch.setattr(scriptgen, "_fit_length", lambda s, sc, w, j: sc)
         s = settings.Settings(llm_provider="featherless", featherless_api_key="k",
                               featherless_base_url=f"http://127.0.0.1:{srv.server_port}/v1")
         script = scriptgen.write(s, "timeline_story", "Your last 48 hours in jail")
@@ -196,8 +198,35 @@ def test_claude_schema_has_no_defaults():
 def test_overlong_script_gets_one_trim_pass(monkeypatch):
     from studio import scriptgen
     long = _script([_beat("word " * 60) for _ in range(5)])
-    short = _script([_beat("short line here.") for _ in range(4)])
+    short = _script([_beat("one two three four five six seven eight.") for _ in range(9)])
+    long.pop("format"); short.pop("format")  # real model output has no format field
     calls = []
     monkeypatch.setattr(llm, "structured", lambda *a, **k: calls.append(1) or (long if len(calls) == 1 else short))
     out = scriptgen.write(settings.Settings(target_seconds=30), "timeline_story", "x")
-    assert len(calls) == 2 and len(out["beats"]) == 4 and out["format"] == "timeline_story"
+    assert len(calls) == 2 and len(out["beats"]) == 9 and out["format"] == "timeline_story"
+
+
+def test_tighten_trims_long_pauses_and_shifts_words(tmp_path):
+    a = tmp_path / "a.mp3"
+    # 1s tone, 1s silence, 1s tone
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i",
+                    "sine=f=300:d=1,apad=pad_dur=1[a];sine=f=300:d=1[b];[a][b]concat=n=2:v=0:a=1",
+                    str(a)], check=True)
+    words = [{"text": "one", "start": 0.0, "end": 1.0, "char": 0},
+             {"text": "two", "start": 2.0, "end": 3.0, "char": 4}]
+    out = tts.tighten(a, words, 0.3)
+    from studio import media
+    assert media.duration(a) == pytest.approx(2.3, abs=0.1)
+    assert out[1]["start"] == pytest.approx(1.3, abs=0.01)
+    assert out[0]["start"] == 0.0
+
+
+def test_art_style_is_forced_onto_script(monkeypatch):
+    from studio import scriptgen
+    sc = _script([_beat("Hello there, friend.")])
+    sc["style"] = "photorealistic"
+    monkeypatch.setattr(llm, "structured", lambda *a, **k: sc)
+    out = scriptgen.write(settings.Settings(art_style="comic"), "timeline_story", "x")
+    assert out["style"] == settings.ART_STYLES["comic"]
+    req = Request(beat=out["beats"][0], index=0, duration=2, script=out, workdir=Path("."), job_id=1)
+    assert req.prompt().startswith("graphic novel comic book art")
