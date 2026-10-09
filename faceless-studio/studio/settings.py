@@ -126,6 +126,18 @@ class Settings(BaseModel):
             return self.visual_style.strip()
         return ART_STYLES.get(self.art_style) or fmt.get("visual_style", "") or ART_STYLES["cartoon"]
 
+    def writer_problem(self) -> str | None:
+        """Why topics/scripts can't be written with the current settings, or None if they can."""
+        if self.llm_provider == "featherless":
+            if not self.secret("featherless_api_key"):
+                return ("The writer is set to Featherless but no Featherless key is saved. "
+                        "Add it in Settings > API keys and click Save settings.")
+        elif not self.secret("anthropic_api_key"):
+            return ("The writer is set to Claude but no Claude API key is saved. Either add one in "
+                    "Settings > API keys, or set Settings > Writing > llm provider to featherless "
+                    "and save your Featherless key.")
+        return None
+
     def output_path(self) -> Path:
         p = Path(self.output_dir)
         return p if p.is_absolute() else ROOT / p

@@ -27,7 +27,7 @@ def enqueue(title: str, fmt: str, preset: str = "autopilot", overrides: dict | N
             script: dict | None = None) -> int:
     resolved = settings.resolve(preset, overrides)
     job_id = db.create_job(title, fmt, preset, resolved.model_dump(), topic_id=topic_id,
-                           source_video=source_video, origin=origin, script=script)
+                           source_video=source_video, origin=origin, script=script, overrides=overrides)
     wake()
     return job_id
 
@@ -54,6 +54,9 @@ def _autopilot_tick() -> None:
         return
     if db.month_spend() >= s.monthly_budget_usd:
         _state["autopilot_note"] = "monthly budget reached"
+        return
+    if problem := s.writer_problem():
+        _state["autopilot_note"] = "paused: " + problem
         return
     added = topics.ensure_pool(s)
     if added:

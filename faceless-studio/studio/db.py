@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     progress REAL NOT NULL DEFAULT 0,
     error TEXT,
     settings_json TEXT NOT NULL,
+    overrides_json TEXT NOT NULL DEFAULT '{}',
     script_json TEXT,
     output_json TEXT,
     log TEXT NOT NULL DEFAULT '',
@@ -69,6 +70,10 @@ def conn() -> sqlite3.Connection:
         c.row_factory = sqlite3.Row
         c.execute("PRAGMA journal_mode=WAL")
         c.executescript(SCHEMA)
+        cols = {r[1] for r in c.execute("PRAGMA table_info(jobs)")}
+        if "overrides_json" not in cols:  # databases created before this column existed
+            c.execute("ALTER TABLE jobs ADD COLUMN overrides_json TEXT NOT NULL DEFAULT '{}'")
+            c.commit()
         _local.conn = c
     return c
 
@@ -119,13 +124,14 @@ def take_topic(fmt: str | None = None) -> dict | None:
 # Jobs ---------------------------------------------------------------------
 
 def create_job(title: str, fmt: str, preset: str, resolved: dict, topic_id: int | None = None,
-               source_video: str | None = None, origin: str = "manual", script: dict | None = None) -> int:
+               source_video: str | None = None, origin: str = "manual", script: dict | None = None,
+               overrides: dict | None = None) -> int:
     now = time.time()
     with tx() as c:
         cur = c.execute(
-            "INSERT INTO jobs (topic_id, title, format, preset, origin, settings_json, script_json, source_video,"
-            " created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (topic_id, title, fmt, preset, origin, json.dumps(resolved),
+            "INSERT INTO jobs (topic_id, title, format, preset, origin, settings_json, overrides_json, script_json,"
+            " source_video, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            (topic_id, title, fmt, preset, origin, json.dumps(resolved), json.dumps(overrides or {}),
              json.dumps(script) if script else None, source_video, now, now),
         )
         return cur.lastrowid

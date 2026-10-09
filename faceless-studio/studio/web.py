@@ -147,6 +147,7 @@ def _job_out(j: dict) -> dict:
     for k in ("script_json", "output_json"):
         j[k.replace("_json", "")] = json.loads(j.pop(k)) if j.get(k) else None
     j["settings"] = json.loads(j.pop("settings_json"))
+    j.pop("overrides_json", None)
     for k in list(j["settings"]):
         if k in settings.SECRET_FIELDS:
             j["settings"].pop(k)
@@ -170,8 +171,14 @@ def get_job(job_id: int) -> dict:
     return _job_out(j)
 
 
+def _check_writer(preset: str | None = None, overrides: dict | None = None, needs_writer: bool = True) -> None:
+    if needs_writer and (problem := settings.resolve(preset, overrides).writer_problem()):
+        raise HTTPException(400, problem)
+
+
 @app.post("/api/jobs")
 def create_job(data: dict[str, Any] = Body(...)) -> dict:
+    _check_writer(data.get("preset"), data.get("overrides"))
     fmt = data.get("format") or None
     title = (data.get("title") or "").strip()
     topic_id = data.get("topic_id")
@@ -199,6 +206,7 @@ def create_job(data: dict[str, Any] = Body(...)) -> dict:
 @app.post("/api/jobs/upload")
 async def create_upload_job(file: UploadFile = File(...), direction: str = Form(""),
                             preset: str = Form("autopilot"), target_seconds: int = Form(0)) -> dict:
+    _check_writer(preset)
     up = settings.DATA / "uploads"
     up.mkdir(parents=True, exist_ok=True)
     dest = up / f"{int(time.time())}_{Path(file.filename or 'upload.mp4').name}"
@@ -237,7 +245,15 @@ def cancel(job_id: int) -> dict:
 
 @app.post("/api/jobs/{job_id}/retry")
 def retry(job_id: int) -> dict:
-    db.update_job(job_id, status="queued", error=None, progress=0, step="Queued")
+    j = db.job(job_id)
+    if not j:
+        raise HTTPException(404)
+    # Re-resolve so fixes made in Settings since the first attempt (keys, provider) apply
+    overrides = json.loads(j.get("overrides_json") or "{}")
+    _check_writer(j["preset"], overrides, needs_writer=not j["script_json"])
+    resolved = settings.resolve(j["preset"], overrides)
+    db.update_job(job_id, status="queued", error=None, progress=0, step="Queued",
+                  settings_json=json.dumps(resolved.model_dump()))
     worker.wake()
     return {"ok": True}
 
@@ -251,6 +267,9 @@ def remake(job_id: int, data: dict[str, Any] = Body(default={})) -> dict:
     script = data.get("script") or (json.loads(j["script_json"]) if j["script_json"] else None)
     if data.get("new_script"):
         script = None
+    if data.get("overrides") is None:
+        data["overrides"] = json.loads(j.get("overrides_json") or "{}")
+    _check_writer(data.get("preset") or j["preset"], data["overrides"], needs_writer=script is None)
     new_id = worker.enqueue(j["title"], j["format"], data.get("preset") or j["preset"],
                             data.get("overrides") or {}, topic_id=j["topic_id"],
                             source_video=j["source_video"], script=script)

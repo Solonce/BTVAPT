@@ -230,3 +230,29 @@ def test_art_style_is_forced_onto_script(monkeypatch):
     assert out["style"] == settings.ART_STYLES["comic"]
     req = Request(beat=out["beats"][0], index=0, duration=2, script=out, workdir=Path("."), job_id=1)
     assert req.prompt().startswith("graphic novel comic book art")
+
+
+def test_missing_writer_key_is_explained_and_retry_picks_up_new_settings(monkeypatch):
+    from fastapi.testclient import TestClient
+    from studio import web
+    client = TestClient(web.app)  # no context manager: don't start the worker thread
+    for k in ("ANTHROPIC_API_KEY", "FEATHERLESS_API_KEY"):
+        monkeypatch.delenv(k, raising=False)
+    settings.SETTINGS_FILE.unlink(missing_ok=True)
+
+    r = client.post("/api/jobs", json={"title": "x", "format": "what_if"})
+    assert r.status_code == 400 and "featherless" in r.json()["detail"]
+    with pytest.raises(llm.LLMError, match="no Claude API key"):
+        llm.structured(settings.load(), "s", "u", {"type": "object"})
+
+    # A job queued while the writer was Claude, failed, then the user switched to Featherless
+    jid = worker.enqueue("x", "what_if", "autopilot", {"target_seconds": 42})
+    db.update_job(jid, status="failed")
+    assert client.post(f"/api/jobs/{jid}/retry").status_code == 400
+    client.put("/api/settings", json={"llm_provider": "featherless", "featherless_api_key": "rc_test"})
+    assert client.post(f"/api/jobs/{jid}/retry").status_code == 200
+    s = settings.Settings(**json.loads(db.job(jid)["settings_json"]))
+    assert s.llm_provider == "featherless" and s.secret("featherless_api_key") == "rc_test"
+    assert s.target_seconds == 42  # per-video overrides survive the refresh
+    settings.SETTINGS_FILE.unlink(missing_ok=True)
+    db.update_job(jid, status="cancelled")

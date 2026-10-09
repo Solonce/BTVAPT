@@ -69,6 +69,8 @@ def _check(resp: Any) -> None:
 def structured(s: Settings, system: str, content: Any, schema: dict, *,
                job_id: int | None = None, what: str = "") -> dict:
     """One call that returns JSON matching `schema`."""
+    if problem := s.writer_problem():
+        raise LLMError(problem)
     if s.llm_provider == "featherless":
         from . import openai_compat
         try:
@@ -98,7 +100,7 @@ def structured(s: Settings, system: str, content: Any, schema: dict, *,
 def research(s: Settings, system: str, prompt: str, *, max_searches: int = 5,
              job_id: int | None = None, what: str = "research") -> str:
     """Free-text answer with Claude's web search tool available."""
-    if s.llm_provider != "claude":
+    if s.llm_provider != "claude" or s.writer_problem():
         return ""  # no hosted web search on other providers; YouTube API titles still feed refills
     client = _client(s)
     messages: list[dict] = [{"role": "user", "content": prompt}]
